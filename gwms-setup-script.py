@@ -249,12 +249,15 @@ GSI "^\/DC\=org\/DC\=terena\/DC\=tcs.*\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \\2@dae
 GSI "^\/DC\=ch\/DC\=cern\/OU\=computers\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \\2@cern.ch
 '''
 
+# Personal certificates: ENV X509_USER_SUBJECT (may contain multiple lines, does not have a newline at the end)
 # old personal cert GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli$$" vofrontend_service
 # Fermilab cert GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
+HTC_CERTMAP_USER_DEFAULT = '''GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
+GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli\ 247$$" vofrontend_service'''
+
+# old default
 HTC_CERTMAP1 = '''GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${frontend}$$" vofrontend_service
 GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${factory}$$" gfactory
-GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
-GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli\ 247$$" vofrontend_service
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=IL\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=com\/DC\=DigiCert-Grid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=DigiCert-Grid\/DC\=com\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
@@ -266,10 +269,9 @@ GSI "^\/DC\=ch\/DC\=cern\/OU\=computers\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@c
 GSI (.*) anonymous
 FS (.*) \\1
 '''
+# OSG certificates
 HTC_CERTMAP2 = '''GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${frontend}$$" vofrontend_service
 GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${factory}$$" gfactory
-GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
-GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli\ 247$$" vofrontend_service
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=IL\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=Illinois\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=com\/DC\=DigiCert-Grid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
@@ -282,10 +284,9 @@ GSI "^\/DC\=ch\/DC\=cern\/OU\=computers\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@c
 GSI (.*) anonymous
 FS (.*) \\1
 '''
+# in-common certificates
 HTC_CERTMAP3 = '''GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}$$" vofrontend_service
 GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}$$" gfactory
-GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
-GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli\ 247$$" vofrontend_service
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=Illinois\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=IL\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@old.daemon.opensciencegrid.org
 GSI "^\/DC\=com\/DC\=DigiCert-Grid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
@@ -304,8 +305,6 @@ GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/O
 GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${factory}$$" gfactory
 GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${factory}$$" gfactory
 GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}$$" gfactory
-GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
-GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli\ 247$$" vofrontend_service
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=Illinois\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=IL\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@old.daemon.opensciencegrid.org
 GSI "^\/DC\=com\/DC\=DigiCert-Grid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
@@ -329,6 +328,13 @@ def write_htc_map(fname='/etc/condor/certs/condor_mapfile1'):
         HTC_CERTMAP = HTC_CERTMAP2
     elif is_incommon_certificate():
         HTC_CERTMAP = HTC_CERTMAP3
+    user_subjects = os.environ.get("X509_USER_SUBJECT")
+    if user_subjects is None:
+        user_subjects = HTC_CERTMAP_USER_DEFAULT
+    else:
+        us_list = [ 'GSI "%s" vofrontend_service\n' % i for i in user_subjects.split('\n') if i ]
+        user_subjects = ''.join(us_list)
+    f.write(user_subjects)
     f.write(T(HTC_CERTMAP).substitute(dict(frontend=escape(FRONTEND), factory=escape(FACTORY))))
     f.close()
 
@@ -729,6 +735,8 @@ ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
+        print "Setup a GWMS Factory or Frontend on Fernicloud. "
+        print "Set  X509_USER_SUBJECT in advance w/ the user/VO subject used for pilots proxies: may contain multiple subjeccts, one per line, escaped or not. Does not have a newline at the end"
         print "%s factory# frontend#   : number or full hostname (no domain). setup used in installation, do not run it multiple times" % sys.argv[0]
         print "%s -a ENTRY_NAME        : add an entry" % sys.argv[0]
         print "%s -d ENTRY_NAME        : remove an entry" % sys.argv[0]

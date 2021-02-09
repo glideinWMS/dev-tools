@@ -1,6 +1,6 @@
 #!/bin/bash
 BASEDIR=/opt/oldlog
-SOURCEDIR=~marcom/data/glideinwms-autoinstaller/aux/
+SOURCEDIR=$HOME/data/glideinwms-autoinstaller/aux/
 
 mydate="`date +"%Y%m%d-%H%M%S-%s"`"
 function clean_condor {
@@ -109,7 +109,16 @@ fi
 echo "Cleaning HTCondor"
 service condor stop
 [ -n "$NODEBUG" ] && echo "Unset HTCondor debug" && rm /etc/condor/config.d/99_debug.config
-[ -n "$SETDEBUG" ] && echo "Enable HTCondor debug" && cp "$SOURCEDIR"/99_debug.config /etc/condor/config.d/99_debug.config
+if [ -n "$SETDEBUG" ]; then
+  echo "Enable HTCondor debug"
+  if [ -e "$SOURCEDIR"/99_debug.config ]; then
+    cp "$SOURCEDIR"/99_debug.config /etc/condor/config.d/99_debug.config
+  else
+    cat << EOF > /etc/condor/config.d/99_debug.config
+ALL_DEBUG = D_FULLDEBUG D_SECURITY
+EOF
+  fi
+fi
 clean_condor
 service condor start
 

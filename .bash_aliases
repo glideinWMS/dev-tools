@@ -1,4 +1,10 @@
-# Remember, alias are only interactive, not in scriupts w/o: shopt -s expand_aliases
+# Remember, alias are only interactive, not in scripts w/o: shopt -s expand_aliases
+# Setup GWMS_DEV_USER in the environment as your desired fermicloudui user or substitute here (not needed if it is $USER)
+export GWMS_DEV_USER=$USER
+# Modify the Git repo if desired
+export GWMS_DEV_REPO="https://raw.githubusercontent.com/glideinwms/dev-tools/master"
+# Setup (init and update) add ~/.bash_aliases ~/.bashcache/fclhosts and some files in ~/bin/
+
 #alias mvim="/Applications/MacVim.app/contents/MacOS/MacVim"
 alias mvim="open -a MacVim.app $@"
 #alias lt='ls --human-readable --size'
@@ -27,11 +33,11 @@ echo " infoalias, fclinit"
 # Fermicloud
 #alias fclrefreshhosts="ssh -K marcom@fermicloudui.fnal.gov  '. /etc/profile.d/one4x.sh; . /etc/profile.d/one4x_user_credentials.sh; ~marcom/bin/myhosts' > ~/.bashcache/fclhosts"
 #alias fclrefreshhosts="ssh -K marcom@fermicloudui.fnal.gov  '~marcom/bin/myhosts -r' > ~/.bashcache/fclhosts"
-alias fclrefreshhosts="ssh -K marcom@fcluigpvm01.fnal.gov  '~marcom/bin/myhosts -r' > ~/.bashcache/fclhosts"
+alias fclrefreshhosts="ssh -K $GWMS_DEV_USER@fcluigpvm01.fnal.gov  '$HOME/bin/myhosts -r' > ~/.bashcache/fclhosts"
 alias fclhosts='cat ~/.bashcache/fclhosts'
 alias fclinit='ssh-init-host'
 #alias fclui='ssh marcom@fermicloudui.fnal.gov'
-alias fclui='ssh marcom@fcluigpvm01.fnal.gov'
+alias fclui="ssh $GWMS_DEV_USER@fcluigpvm01.fnal.gov"
 alias fclvofrontend='ssh root@gwms-dev-frontend.fnal.gov'
 alias fclfactory='ssh root@gwms-dev-factory.fnal.gov'
 alias fclweb='ssh root@gwms-web.fnal.gov'
@@ -103,7 +109,7 @@ cl() {
 
 gwms-test-job() {
   [[ "$1" = "-h" ]] && { echo -e "gwms-test-job [-h | USER [-l | SUBMIT_FILE]]\nSubmitting condor jobs from the USER's ~/condor-test/ directory"; return; }
-  local juser=${1:-marcom}
+  local juser=${1:-$GWMS_DEV_USER}
   [[ "$2" = "-l" ]] && { su -c "cd condor-test/; ls *sub" - $juser; return; }
   local job=${2:-test-vanilla.sub}
   if [ $(id -u) -eq 0 ]; then
@@ -179,7 +185,8 @@ ssh-init-host() {
   local hname=$(ssh-last $1)
   local huser=${2:-root}
   echo "Initializing ${huser}@${hname}"
-  scp "$HOME"/prog/repos/git-gwms/gwms-tools/.bash_aliases ${huser}@${hname}: >/dev/null && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
+  #scp "$HOME"/prog/repos/git-gwms/gwms-tools/.bash_aliases ${huser}@${hname}: >/dev/null && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
+  ssh ${huser}@${hname}  "curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null" && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
 }
 
 fcl-fe-certs() {
@@ -195,7 +202,6 @@ fcl-fe-certs() {
   popd
   /bin/cp /etc/gwms-frontend/fe_proxy /etc/gwms-frontend/vo_proxy
   kx509
-  #/bin/cp ~marcom/mm_proxy-now /etc/gwms-frontend/mm_proxy
   voms-proxy-init -rfc -dont-verify-ac -noregen -voms fermilab -valid 500:0
   /bin/cp /tmp/x509up_u0 /etc/gwms-frontend/mm_proxy
   chown frontend: /etc/gwms-frontend/*
@@ -203,8 +209,8 @@ fcl-fe-certs() {
   echo "Proxy renewed (/etc/gwms-frontend/vo_proxy, /etc/gwms-frontend/mm_proxy), now checking..."
   if command -v gwms-check-proxies.sh >/dev/null; then
     gwms-check-proxies.sh
-  elif [ -x ~marcom/bin/gwms-check-proxies.sh ]; then
-    ~marcom/bin/gwms-check-proxies.sh
+  elif [ -x $HOME/bin/gwms-check-proxies.sh ]; then
+    $HOME/bin/gwms-check-proxies.sh
   else
     echo "No gwms-check-proxies found"
   fi
@@ -212,7 +218,7 @@ fcl-fe-certs() {
 
 aliases-update() {
   [ -e "$HOME/.bash_aliases" ] && command cp -f "$HOME"/.bash_aliases "$HOME"/.bash_aliases.bck
-  if ! curl -L -o $HOME/.bash_aliases https://raw.githubusercontent.com/mambelli/gwms-tools/master/.bash_aliases 2>/dev/null; then
+  if ! curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null; then
     echo "Download from github.com failed. Update failed."
     return 1
   fi
@@ -228,8 +234,9 @@ EOF
   fi
   # copy also some binaries
   mkdir -p "$HOME"/bin
-  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-proxies.sh ; do
-    curl -L -o $HOME/bin/$i https://raw.githubusercontent.com/mambelli/gwms-tools/master/$i 2>/dev/null && chmod +x $HOME/bin/$i
+  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-proxies.sh myhosts.sh; do
+    curl -L -o $HOME/bin/$i $GWMS_DEV_REPO/$i 2>/dev/null && chmod +x $HOME/bin/$i
+    [[ $? -ne 0 ]] && echo "Error downloading $i. Continuing."
   done
   . $HOME/.bash_aliases
 }

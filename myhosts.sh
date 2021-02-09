@@ -37,7 +37,7 @@ if $REFRESH; then
 fi
 
 if $VERBOSE; then
-  #onevm list |grep marco | awk '{ print $1 }' | xargs onevm show | grep IP_P | cut -d= -f2 | cut -d, -f1 | xargs -n1 host
+  #onevm list |grep $USER | awk '{ print $1 }' | xargs onevm show | grep IP_P | cut -d= -f2 | cut -d, -f1 | xargs -n1 host
   onevm list | grep $USER | awk '{ print $1 }' | xargs -n1 onevm show | grep ETH0_IP | cut -d\" -f2 | xargs -n1 host
 
   echo
