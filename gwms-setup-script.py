@@ -97,16 +97,15 @@ def is_incommon_certificate(certfname="/etc/grid-security/hostcert.pem"):
 
 HTC_TARBALLS = """   <condor_tarballs>
       <condor_tarball arch="default" base_dir="/usr" os="default" version="default"/>
-      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.9.7-x86_64_CentOS7-unstripped" os="rhel7" version="8.9"/>
-      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.9.7-x86_64_CentOS8-unstripped" os="rhel8" version="8.9"/> 
-      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.8.9-x86_64_CentOS7-stripped" os="rhel7" version="default"/>
-      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.8.9-x86_64_CentOS8-stripped" os="rhel8" version="default"/> 
-      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.8.9-x86_64_RedHat6-stripped" os="rhel6" version="default"/> 
+      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-9.0.5-x86_64_CentOS7-stripped" os="rhel7" version="8.9"/>
+      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.8.15-x86_64_CentOS7-stripped" os="rhel7" version="default"/>
   </condor_tarballs>
 """
 
 # to add back for RHEL6 nodes
 """
+      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.8.9-x86_64_CentOS8-stripped" os="rhel8" version="default"/> 
+      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.8.9-x86_64_RedHat6-stripped" os="rhel6" version="default"/> 
       <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.4.0-x86_64_RedHat7-stripped" os="rhel7" version="8.4.0"/>
       <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-8.4.0-x86_64_RedHat6-stripped" os="rhel6" version="8.4.0"/> 
       <condor_tarball arch="x86" base_dir="/var/lib/gwms-factory/condor/condor-8.4.0-x86_RedHat6-stripped" os="rhel6" version="default"/> 
@@ -339,7 +338,7 @@ def write_htc_map(fname='/etc/condor/certs/condor_mapfile1'):
     f.close()
 
 
-ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid_proxy" enabled="True" gatekeeper="fermicloud025.fnal.gov/jobmanager-condor" gridtype="gt2" rsl="(queue=default)(jobtype=single)" trust_domain="grid" verbosity="std" work_dir="OSG">
+ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid_proxy" enabled="True" gatekeeper="fermicloud592.fnal.gov/jobmanager-condor" gridtype="gt2" rsl="(queue=default)(jobtype=single)" trust_domain="grid" verbosity="std" work_dir="OSG">
          <config>
             <max_jobs>
                <default_per_frontend glideins="5000" held="50" idle="100"/>
@@ -372,7 +371,7 @@ ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid
          </monitorgroups>
       </entry>
 """,
-'ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid_proxy" enabled="True" gatekeeper="fermicloud025.fnal.gov fermicloud025.fnal.gov:9619" gridtype="condor" rsl="" trust_domain="grid" verbosity="std" work_dir="OSG">
+'ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid_proxy" enabled="True" gatekeeper="fermicloud592.fnal.gov fermicloud592.fnal.gov:9619" gridtype="condor" rsl="" trust_domain="grid" verbosity="std" work_dir="OSG">
          <config>
             <max_jobs>
                <default_per_frontend glideins="5000" held="50" idle="100"/>
@@ -405,7 +404,7 @@ ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid
          </monitorgroups>
       </entry>
 """,
-    'old_ITB_FC_CE3': """      <entry name="ITB_FC_CE3" auth_method="grid_proxy" enabled="True" gatekeeper="fermicloud121.fnal.gov/jobmanager-condor" gridtype="gt2" rsl="(queue=default)(jobtype=single)" trust_domain="grid" verbosity="std" work_dir="OSG">
+    'old_ITB_FC_CE3': """      <entry name="ITB_FC_CE3" auth_method="grid_proxy" enabled="False" gatekeeper="fermicloud121.fnal.gov/jobmanager-condor" gridtype="gt2" rsl="(queue=default)(jobtype=single)" trust_domain="grid" verbosity="std" work_dir="OSG">
          <config>
             <max_jobs>
                <default_per_frontend glideins="5000" held="50" idle="100"/>
@@ -438,7 +437,7 @@ ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid
          </monitorgroups>
       </entry>
 """,
-    'ITB_FC_CE3': """      <entry name="ITB_FC_CE3" auth_method="grid_proxy" enabled="True" gatekeeper="fermicloud121.fnal.gov fermicloud121.fnal.gov:9619" gridtype="condor" rsl="" trust_domain="grid" verbosity="std" work_dir="OSG">
+    'ITB_FC_CE3': """      <entry name="ITB_FC_CE3" auth_method="grid_proxy" enabled="False" gatekeeper="fermicloud121.fnal.gov fermicloud121.fnal.gov:9619" gridtype="condor" rsl="" trust_domain="grid" verbosity="std" work_dir="OSG">
          <config>
             <max_jobs>
                <default_per_frontend glideins="5000" held="50" idle="100"/>
@@ -471,7 +470,7 @@ ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid
          </monitorgroups>
       </entry>
 """,
-    'ITB_FC_CE3x4': """     <entry name="ITB_FC_CE3x4" auth_method="grid_proxy" enabled="True" gatekeeper="fermicloud121.fnal.gov fermicloud121.fnal.gov:9617" gridtype="condor" rsl="" trust_domain="grid" verbosity="std" work_dir="OSG">
+    'ITB_FC_CE3x4': """     <entry name="ITB_FC_CE3x4" auth_method="grid_proxy" enabled="False" gatekeeper="fermicloud121.fnal.gov fermicloud121.fnal.gov:9617" gridtype="condor" rsl="" trust_domain="grid" verbosity="std" work_dir="OSG">
          <config>
             <max_jobs>
                <default_per_frontend glideins="5000" held="50" idle="100"/>

@@ -29,8 +29,8 @@ if [[ -e /etc/gwms-frontend ]]; then
   fever=$(yum list installed glideinwms-vofrontend | grep vofrontend | xargs echo | cut -d ' ' -f 2)
   echo "Found GWMS VO Frontend (/etc/gwms-frontend), version $fever"
 fi
-[[ -e /etc/condor ]] && { iscondor=true; echo "Found HTCondor (/etc/condor)"; }
-[[ -e /etc/condor-se ]] && { iscondorce=true; echo "Found HTCondor-CE (/etc/condor-ce)"; }
+[[ -e /etc/condor ]] && { iscondor=true; echo "Found HTCondor (/etc/condor), version $(rpm -q condor)"; }
+[[ -e /etc/condor-ce ]] && { iscondorce=true; echo "Found HTCondor-CE (/etc/condor-ce), version $(rpm -q htcondor-ce)"; }
 
 if ! $isfactory && ! $isfrontend; then
   echo "No GWMS Factory or Frontend found"

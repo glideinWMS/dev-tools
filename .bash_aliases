@@ -1,6 +1,11 @@
-# Remember, alias are only interactive, not in scripts w/o: shopt -s expand_aliases
-# Setup GWMS_DEV_USER in the environment as your desired fermicloudui user or substitute here (not needed if it is $USER)
-export GWMS_DEV_USER=$USER
+# Remember, alias are only interactive, not in scriupts w/o: shopt -s expand_aliases
+# bash -i -c 'myalias' will work because makes the shell interactive
+# and use -t to force a terminal session (needed to insert interactive input like a password), -tt to force a tesminal also when ssh doesn't have it
+# e.g. alias fclremotesettoken="ssh -t -K openstackuigpvm01.fnal.gov  'bash -i -c fclsettoken' 2> /dev/null"
+# "$PWD" resolved at definition, '$PWD' resolved at use,  'part1 '"'"'quoted'"'"' part2' adds a single quoted part in a single quote string (string concatenation in shells) 
+
+# Setup GWMS_DEV_USER in the environment as your desired fermicloud UI (openstackuigpvm01) user or substitute here (not needed if it is $USER)
+export GWMS_DEV_USER=${GWMS_DEV_USER:-$USER}
 # Modify the Git repo if desired
 export GWMS_DEV_REPO="https://raw.githubusercontent.com/glideinwms/dev-tools/master"
 # Setup (init and update) add ~/.bash_aliases ~/.bashcache/fclhosts and some files in ~/bin/
@@ -16,6 +21,7 @@ alias dfh='df -h -T hfs,apfs,exfat,ntfs,noowners'
 # git
 alias gpo='git push origin'
 alias gitmodified="git status | grep modified | awk '{print \$2}' | tr $'\n' ' '"
+alias gitgraph='git log --all --decorate --oneline --graph'
 alias cg='cd `git rev-parse --show-toplevel`'
 alias cdgwms='cd prog/repos/git-gwms/'
 alias cdm='cd-with-memory'
@@ -31,13 +37,19 @@ echo " infoalias, fclinit"
 
 ## For laptop
 # Fermicloud
+alias fclsettoken='OST_PROJECT=${OST_PROJECT:-glideinwms} ; export OS_TOKEN=$(openstack --os-username=$USER  --os-user-domain-name=services --os-project-domain-name=services --os-project-name $OST_PROJECT  --os-auth-url http://131.225.153.227:5000/v3  --os-system-scope all token issue --format json | jq -r '"'"'.id'"'"') && rm -f "$HOME"/.fclcache/token && echo "OST_PROJECT=$OST_PROJECT" > "$HOME"/.fclcache/token && chmod 600 "$HOME"/.fclcache/token && echo "OS_TOKEN_DATE=$(date +%Y-%m-%dT%H:%M:%S%z)" >> "$HOME"/.fclcache/token && echo "OS_TOKEN=$OS_TOKEN" >> "$HOME"/.fclcache/token'
+# Will ask for service password
+#alias fclremotesettoken="ssh -t -K marcom@openstackuigpvm01.fnal.gov  'bash -i -c fclsettoken' 2> /dev/null"
+alias fclremotesettoken="ssh -t -K openstackuigpvm01.fnal.gov  'bash -i -c fclsettoken' 2> /dev/null"
 #alias fclrefreshhosts="ssh -K marcom@fermicloudui.fnal.gov  '. /etc/profile.d/one4x.sh; . /etc/profile.d/one4x_user_credentials.sh; ~marcom/bin/myhosts' > ~/.bashcache/fclhosts"
 #alias fclrefreshhosts="ssh -K marcom@fermicloudui.fnal.gov  '~marcom/bin/myhosts -r' > ~/.bashcache/fclhosts"
-alias fclrefreshhosts="ssh -K $GWMS_DEV_USER@fcluigpvm01.fnal.gov  '$HOME/bin/myhosts -r' > ~/.bashcache/fclhosts"
+#alias fclrefreshhosts="ssh -K marcom@fcluigpvm01.fnal.gov  '~marcom/bin/myhosts -r' > ~/.bashcache/fclhosts"
+alias fclrefreshhosts="ssh -K $GWMS_DEV_USER@openstackuigpvm01.fnal.gov  '~/bin/myhosts.sh' > ~/.bashcache/fclhosts"
 alias fclhosts='cat ~/.bashcache/fclhosts'
 alias fclinit='ssh-init-host'
+alias fclinfo='gwms-what.sh'
 #alias fclui='ssh marcom@fermicloudui.fnal.gov'
-alias fclui="ssh $GWMS_DEV_USER@fcluigpvm01.fnal.gov"
+alias fclui="ssh $GWMS_DEV_USER@openstackuigpvm01.fnal.gov"
 alias fclvofrontend='ssh root@gwms-dev-frontend.fnal.gov'
 alias fclfactory='ssh root@gwms-dev-factory.fnal.gov'
 alias fclweb='ssh root@gwms-web.fnal.gov'
@@ -66,17 +78,22 @@ alias ccq='condor_q -global -allusers'
 alias ccql='htc_foreach_schedd -f1 condor_q -allusers -af ClusterId ProcId GlideinEntryName GlideinClient JobStatus Cmd -name'
 alias ccqlv='htc_foreach_schedd -v -f1 condor_q -allusers -af ClusterId ProcId GlideinEntryName GlideinClient JobStatus Cmd -name'
 alias ccrm='condor_rm -all -name'
+alias ccrmg2='su -c "condor_rm -name schedd_glideins2@$HOSTNAME -all" - gfactory'
+alias ccrmg3='su -c "condor_rm -name schedd_glideins3@$HOSTNAME -all" - gfactory'
+alias ccrmg4='su -c "condor_rm -name schedd_glideins4@$HOSTNAME -all" - gfactory'
 alias ccrma='htc_foreach_schedd condor_rm -all -name'
 
 ## These are for root on fermicloud hosts
 # GWMS manage
 alias festart='/bin/systemctl start gwms-frontend'
+alias festartall='for s in fetch-crl-cron httpd condor gwms-frontend fetch-crl-boot; do echo "Starting $s"; /bin/systemctl start $s; done'
 alias festop='/bin/systemctl stop gwms-frontend'
 alias fereconfig='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend reconfig; /bin/systemctl start gwms-frontend'
 alias feupgrade='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend upgrade; /bin/systemctl start gwms-frontend'
 alias fecredrenewal='fcl-fe-certs'  # alias to make it easy to find - renew proxy from certs/creds
 alias fetest='su -c "cd condor-test/; condor_submit test-vanilla.sub" -'
 alias fastart='/bin/systemctl start gwms-factory'
+alias fastartall='for s in fetch-crl-cron httpd condor gwms-factory fetch-crl-boot; do echo "Starting $s"; /bin/systemctl start $s; done'
 alias fastop='/bin/systemctl stop gwms-factory'
 alias faupgrade='/bin/systemctl stop gwms-factory; /usr/sbin/gwms-factory upgrade ; /bin/systemctl start gwms-factory'
 alias fareconfig='/bin/systemctl stop gwms-factory; /usr/sbin/gwms-factory reconfig; /bin/systemctl start gwms-factory'
@@ -168,7 +185,10 @@ ssh-last() {
   [ "$sel" == "ce" ] && sel=fermicloud025
   [[ "$sel" =~ ^[0-9]+$ ]] && sel="fermicloud$sel"
   myhost=$(grep "$sel" ~/.bashcache/fclhosts | tail -n 1 | cut -d ' ' -f 3 )
-  [ -z "$myhost" ] && { echo "Host $1 ($sel) not found on fermicloud list."; return 1; }
+  if [ -z "$myhost" ]; then
+    [[ ! "$sel" =~ ^fermicloud[0-9]+\.fnal\.gov$ ]] && { echo "Host $1 ($sel) not found on fermicloud list."; return 1; }
+    myhost=$sel
+  fi
   shift
   echo $myhost
   if $dossh; then
@@ -186,7 +206,9 @@ ssh-init-host() {
   local huser=${2:-root}
   echo "Initializing ${huser}@${hname}"
   #scp "$HOME"/prog/repos/git-gwms/gwms-tools/.bash_aliases ${huser}@${hname}: >/dev/null && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
-  ssh ${huser}@${hname}  "curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null" && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
+  #ssh ${huser}@${hname}  "curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null" && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
+  ssh ${huser}@${hname}  "curl -L -o ~/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null && . ~/.bash_aliases && aliases-update"
+
 }
 
 fcl-fe-certs() {
@@ -209,8 +231,8 @@ fcl-fe-certs() {
   echo "Proxy renewed (/etc/gwms-frontend/vo_proxy, /etc/gwms-frontend/mm_proxy), now checking..."
   if command -v gwms-check-proxies.sh >/dev/null; then
     gwms-check-proxies.sh
-  elif [ -x $HOME/bin/gwms-check-proxies.sh ]; then
-    $HOME/bin/gwms-check-proxies.sh
+  elif [ -x ~marcom/bin/gwms-check-proxies.sh ]; then
+    ~marcom/bin/gwms-check-proxies.sh
   else
     echo "No gwms-check-proxies found"
   fi
@@ -233,11 +255,30 @@ fi
 EOF
   fi
   # copy also some binaries
+  mkdir -p "$HOME"/.fclcache
   mkdir -p "$HOME"/bin
-  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-proxies.sh myhosts.sh; do
+  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-proxies.sh myhosts.sh ; do
     curl -L -o $HOME/bin/$i $GWMS_DEV_REPO/$i 2>/dev/null && chmod +x $HOME/bin/$i
     [[ $? -ne 0 ]] && echo "Error downloading $i. Continuing."
   done
+  # If root, update some system files. This only for fermicloud hosts
+  if [[ -w /etc/profile && "$(hostname)" = fermicloud* ]]; then
+    if ! grep "# Added by alias-update" /etc/profile >/dev/null; then
+      cat >> /etc/profile << EOF
+# Added by alias-update
+[ -f /etc/motd.local ] && { tput setaf 2; cat /etc/motd.local; tput sgr0; }
+tput setaf 2
+if [ -x /root/bin/gwms-what.sh ]; then
+  /root/bin/gwms-what.sh
+elif [ -x "$HOME/bin/gwms-what.sh" ]; then
+  "$HOME/bin/gwms-what.sh"
+fi
+tput sgr0
+# End from alias-update
+EOF
+    fi
+  fi
+  # source alias definitions to load updates
   . $HOME/.bash_aliases
 }
 
