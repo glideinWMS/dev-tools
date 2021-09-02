@@ -37,10 +37,11 @@ echo " infoalias, fclinit"
 
 ## For laptop
 # Fermicloud
-alias fclsettoken='OST_PROJECT=${OST_PROJECT:-glideinwms} ; export OS_TOKEN=$(openstack --os-username=$USER  --os-user-domain-name=services --os-project-domain-name=services --os-project-name $OST_PROJECT  --os-auth-url http://131.225.153.227:5000/v3  --os-system-scope all token issue --format json | jq -r '"'"'.id'"'"') && rm -f "$HOME"/.fclcache/token && echo "OST_PROJECT=$OST_PROJECT" > "$HOME"/.fclcache/token && chmod 600 "$HOME"/.fclcache/token && echo "OS_TOKEN_DATE=$(date +%Y-%m-%dT%H:%M:%S%z)" >> "$HOME"/.fclcache/token && echo "OS_TOKEN=$OS_TOKEN" >> "$HOME"/.fclcache/token'
+alias fcltokenlocal='OST_PROJECT=${OST_PROJECT:-glideinwms} ; export OS_TOKEN=$(openstack --os-username=$USER  --os-user-domain-name=services --os-project-domain-name=services --os-project-name $OST_PROJECT  --os-auth-url http://131.225.153.227:5000/v3  --os-system-scope all token issue --format json | jq -r '"'"'.id'"'"') && rm -f "$HOME"/.fclcache/token && echo "OST_PROJECT=$OST_PROJECT" > "$HOME"/.fclcache/token && chmod 600 "$HOME"/.fclcache/token && echo "OS_TOKEN_DATE=$(date +%Y-%m-%dT%H:%M:%S%z)" >> "$HOME"/.fclcache/token && echo "OS_TOKEN=$OS_TOKEN" >> "$HOME"/.fclcache/token'
 # Will ask for service password
 #alias fclremotesettoken="ssh -t -K marcom@openstackuigpvm01.fnal.gov  'bash -i -c fclsettoken' 2> /dev/null"
-alias fclremotesettoken="ssh -t -K openstackuigpvm01.fnal.gov  'bash -i -c fclsettoken' 2> /dev/null"
+alias fcltoken="ssh -t -K $GWMS_DEV_USER@openstackuigpvm01.fnal.gov  'bash -i -c fcltokenlocal' 2> /dev/null"
+alias fcltokendelete="ssh -t -K $GWMS_DEV_USER@openstackuigpvm01.fnal.gov  'rm -f ~/.fclcache/token' 2> /dev/null"
 #alias fclrefreshhosts="ssh -K marcom@fermicloudui.fnal.gov  '. /etc/profile.d/one4x.sh; . /etc/profile.d/one4x_user_credentials.sh; ~marcom/bin/myhosts' > ~/.bashcache/fclhosts"
 #alias fclrefreshhosts="ssh -K marcom@fermicloudui.fnal.gov  '~marcom/bin/myhosts -r' > ~/.bashcache/fclhosts"
 #alias fclrefreshhosts="ssh -K marcom@fcluigpvm01.fnal.gov  '~marcom/bin/myhosts -r' > ~/.bashcache/fclhosts"
