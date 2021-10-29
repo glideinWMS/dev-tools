@@ -1,6 +1,6 @@
 #!/bin/bash
 BASEDIR=/opt/oldlog
-SOURCEDIR=$HOME/data/glideinwms-autoinstaller/aux/
+SOURCEDIR=$HOME/bin
 
 mydate="`date +"%Y%m%d-%H%M%S-%s"`"
 function clean_condor {
@@ -97,21 +97,21 @@ mkdir -p "$BASEDIR"
 # GWMS stop (before cycling HTCondor)
 if [ -e /etc/gwms-frontend/frontend.xml ]; then
   echo "Stopping frontend"
-  service gwms-frontend stop
+  systemctl stop gwms-frontend
 fi
 
 if [ -e /etc/gwms-factory/glideinWMS.xml ]; then
   echo "Stopping factory"
-  service gwms-factory stop
+  systemctl stop gwms-factory
 fi
 
 # HTCondor
 echo "Cleaning HTCondor"
-service condor stop
+systemctl stop condor
 [ -n "$NODEBUG" ] && echo "Unset HTCondor debug" && rm /etc/condor/config.d/99_debug.config
 if [ -n "$SETDEBUG" ]; then
   echo "Enable HTCondor debug"
-  if [ -e "$SOURCEDIR"/99_debug.config ]; then
+  if [ -r "$SOURCEDIR"/99_debug.config ]; then
     cp "$SOURCEDIR"/99_debug.config /etc/condor/config.d/99_debug.config
   else
     cat << EOF > /etc/condor/config.d/99_debug.config
@@ -120,7 +120,7 @@ EOF
   fi
 fi
 clean_condor
-service condor start
+systemctl start condor
 
 # To le condor restart and avoid errors
 echo "Waiting for condor to start"
@@ -131,13 +131,13 @@ condor_status -any
 if [ -e /etc/gwms-frontend/frontend.xml ]; then
   echo "Cleaning frontend"
   clean_gwms_fe
-  service gwms-frontend start
+  systemctl start gwms-frontend
 fi
 
 if [ -e /etc/gwms-factory/glideinWMS.xml ]; then
   echo "Cleaning factory"
   clean_gwms_fa
-  service gwms-factory start
+  systemctl start gwms-factory
 fi
 
 

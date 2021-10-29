@@ -54,8 +54,8 @@ alias fclui="ssh $GWMS_DEV_USER@openstackuigpvm01.fnal.gov"
 alias fclvofrontend='ssh root@gwms-dev-frontend.fnal.gov'
 alias fclfactory='ssh root@gwms-dev-factory.fnal.gov'
 alias fclweb='ssh root@gwms-web.fnal.gov'
-alias slv='ssh-last ssh root vofrontend'
-alias slf='ssh-last ssh root factory'
+alias slv='ssh-last ssh root U_vofrontend'
+alias slf='ssh-last ssh root U_factory'
 alias fcl='ssh-last ssh root'
 alias fcl025='ssh root@fermicloud025.fnal.gov' 
 #alias sgweb='ssh root@gwms-web.fnal.gov'
@@ -168,8 +168,11 @@ cd-with-memory() {
 ssh-last() {
   # return the full hostname of the last host of the requested type (or do partial name matches), optionally ssh to it
   # valid types: fact, factory, vofe, frontend, vofrontend, web, ce (fermicloud025), INT (fermicloudINT)
+  # OpenStack presents all hosts of the project, "U_" prefix to search only user VMs
+  # VMs are in reverse order, most recent first
   local dossh=false
   local asroot=false
+  local filteruser=
   if [ "$1" = "ssh" ]; then
     dossh=true
     shift
@@ -179,13 +182,21 @@ ssh-last() {
     shift
   fi  
   local sel="$1"
+  if [[ "$sel" == U_* ]]; then
+    filteruser="$GWMS_DEV_USER"
+    sel="${sel#U_}"
+  fi
   [ "$sel" == "factory" ] && sel=fact
   [ "$sel" == "frontend" ] && sel=vofe
   [ "$sel" == "vofrontend" ] && sel=vofe
   [ "$sel" == "web" ] && sel=gwms-web
   [ "$sel" == "ce" ] && sel=fermicloud025
   [[ "$sel" =~ ^[0-9]+$ ]] && sel="fermicloud$sel"
-  myhost=$(grep "$sel" ~/.bashcache/fclhosts | tail -n 1 | cut -d ' ' -f 3 )
+  if [ -n "$filteruser" ]; then
+    myhost=$(grep "$filteruser" ~/.bashcache/fclhosts | grep "$sel" | head -n 1 | cut -d ' ' -f 3 )
+  else
+    myhost=$(grep "$sel" ~/.bashcache/fclhosts | head -n 1 | cut -d ' ' -f 3 )
+  fi
   if [ -z "$myhost" ]; then
     [[ ! "$sel" =~ ^fermicloud[0-9]+\.fnal\.gov$ ]] && { echo "Host $1 ($sel) not found on fermicloud list."; return 1; }
     myhost=$sel
@@ -258,7 +269,7 @@ EOF
   # copy also some binaries
   mkdir -p "$HOME"/.fclcache
   mkdir -p "$HOME"/bin
-  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-proxies.sh myhosts.sh ; do
+  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-proxies.sh myhosts.sh 99_debug.config; do
     curl -L -o $HOME/bin/$i $GWMS_DEV_REPO/$i 2>/dev/null && chmod +x $HOME/bin/$i
     [[ $? -ne 0 ]] && echo "Error downloading $i. Continuing."
   done
