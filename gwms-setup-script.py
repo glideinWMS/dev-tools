@@ -20,55 +20,56 @@ from string import Template as T
 #from xml.etree.ElementTree import ElementTree as ET
 import xml.etree.ElementTree as ET
 
-FACTORY='fermicloud110.fnal.gov'
-FRONTEND='fermicloud048.fnal.gov'
+FACTORY = 'fermicloud110.fnal.gov'
+FRONTEND = 'fermicloud048.fnal.gov'
+HTC_VERSION = None
 XML_LOG_ALL='<process_log backup_count="5" extension="all" max_days="7.0" max_mbytes="100.0" min_days="3.0" msg_types="INFO,DEBUG,ERR,WARN,EXCEPTION"/>'
 XML_LOG_BAD='<process_log backup_count="5" extension="bad" max_days="7.0" max_mbytes="100.0" min_days="3.0" msg_types="ERR,WARN,EXCEPTION"/>'
 
-XML_COLLECTOR1='<collector DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
-XML_COLLECTOR2='<collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
-XML_COLLECTOR3='<collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
+XML_COLLECTOR1 = '<collector DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
+XML_COLLECTOR2 = '<collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
+XML_COLLECTOR3 = '<collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
 
-XML_SECURITY1='''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
+XML_SECURITY1 = '''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
       <credentials>
          <credential absfname="/etc/gwms-frontend/mm_proxy" security_class="frontend" trust_domain="grid" type="grid_proxy"/>
       </credentials>
    </security>
 '''
-XML_SECURITY2='''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
+XML_SECURITY2 = '''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
       <credentials>
          <credential absfname="/etc/gwms-frontend/mm_proxy" security_class="frontend" trust_domain="grid" type="grid_proxy"/>
       </credentials>
    </security>
 '''
-XML_SECURITY3='''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
+XML_SECURITY3 = '''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
       <credentials>
          <credential absfname="/etc/gwms-frontend/mm_proxy" security_class="frontend" trust_domain="grid" type="grid_proxy"/>
       </credentials>
    </security>
 '''
 
-XML_WMS_COLLECTOR1='''   <collectors>
+XML_WMS_COLLECTOR1 = '''   <collectors>
       <collector DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${frontend}" group="default" node="${frontend}:9618" secondary="False"/>
-      <collector DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services//CN=${frontend}" group="default" node="${frontend}:9620-9660" secondary="True"/>
+      <collector DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services//CN=${frontend}" group="default" node="${frontend}:9618?sock=collector1-40" secondary="True"/>
    </collectors>
 '''
-XML_WMS_COLLECTOR2='''   <collectors>
+XML_WMS_COLLECTOR2 = '''   <collectors>
       <collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" group="default" node="${frontend}:9618" secondary="False"/>
-      <collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" group="default" node="${frontend}:9620-9660" secondary="True"/>
+      <collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" group="default" node="${frontend}:9618?sock=collector1-40" secondary="True"/>
    </collectors>
 '''
 #/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=fermicloud315.fnal.gov
-XML_WMS_COLLECTOR3='''   <collectors>
+XML_WMS_COLLECTOR3 = '''   <collectors>
       <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" group="default" node="${frontend}:9618" secondary="False"/>
-      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" group="default" node="${frontend}:9620-9660" secondary="True"/>
+      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" group="default" node="${frontend}:9618?sock=collector1-40" secondary="True"/>
    </collectors>
 '''
 
 
-XML_SCHEDD1='            <schedd DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${frontend}" fullname="${frontend}"/>'
-XML_SCHEDD2='            <schedd DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" fullname="${frontend}"/>'
-XML_SCHEDD3='            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" fullname="${frontend}"/>'
+XML_SCHEDD1 = '            <schedd DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${frontend}" fullname="${frontend}"/>'
+XML_SCHEDD2 = '            <schedd DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" fullname="${frontend}"/>'
+XML_SCHEDD3 = '            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" fullname="${frontend}"/>'
 
 
 def is_osg_certificate(certfname="/etc/grid-security/hostcert.pem"):
@@ -94,6 +95,14 @@ def is_incommon_certificate(certfname="/etc/grid-security/hostcert.pem"):
         print "Error evaluating host certificate: %s" % s2
         print "Considering DigiCert certificates"
     return False
+
+HTC_TARBALLS1 = """   <condor_tarballs>
+      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-${condor_version}-x86_64_CentOS7-stripped" os="default" version="default"/>
+      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-${condor_version}-x86_64_CentOS7-stripped" os="rhel7" version="default"/>
+      <condor_tarball arch="default" base_dir="/var/lib/gwms-factory/condor/condor-${condor_version}-x86_64_CentOS7-stripped" os="rhel7" version="${condor_version}"/>
+      <condor_tarball arch="x86_64" base_dir="/var/lib/gwms-factory/condor/condor-${condor_version}-x86_64_CentOS7-stripped" os="rhel7" version="${condor_version}"/>
+  </condor_tarballs>
+"""
 
 HTC_TARBALLS = """   <condor_tarballs>
       <condor_tarball arch="default" base_dir="/usr" os="default" version="default"/>
@@ -128,7 +137,11 @@ def factory_config1(fname='/etc/gwms-factory/glideinWMS.xml', entries=['ITB_FC_C
     elem.append(ET.XML(XML_LOG_BAD))
     elem = tree.find('condor_tarballs')
     tree.getroot().remove(elem)
-    tree.getroot().append(ET.XML(HTC_TARBALLS))
+    if HTC_VERSION is not None:
+        htc_tarballs = T(HTC_TARBALLS1).substitute(dict(condor_version=HTC_VERSION))
+    else:
+        htc_tarballs = HTC_TARBALLS
+    tree.getroot().append(ET.XML(htc_tarballs))
     elem = tree.find('entries')
     for i in entries:
         elem.append(ET.XML(ENTRIES[i]))
@@ -736,6 +749,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 3:
         print "Setup a GWMS Factory or Frontend on Fernicloud. "
         print "Set  X509_USER_SUBJECT in advance w/ the user/VO subject used for pilots proxies: may contain multiple subjeccts, one per line, escaped or not. Does not have a newline at the end"
+        print "Set  HTC_VER in advance w/ a specific HTCondor version if you don't want the default"
         print "%s factory# frontend#   : number or full hostname (no domain). setup used in installation, do not run it multiple times" % sys.argv[0]
         print "%s -a ENTRY_NAME        : add an entry" % sys.argv[0]
         print "%s -d ENTRY_NAME        : remove an entry" % sys.argv[0]
@@ -762,6 +776,14 @@ if __name__ == "__main__":
         FRONTEND='fermicloud%s.fnal.gov' % sys.argv[2]
     except:
         FRONTEND='%s.fnal.gov' % sys.argv[2]
+    try:
+        HTC_VERSION = os.environ["HTC_VER"]
+        if not HTC_VERSION:
+            HTC_VERSION = None
+        else:
+            print "HTCondor version from the environment HTC_VER=%s" % HTC_VERSION
+    except KeyError:
+        HTC_VERSION = None
     fname='/etc/gwms-frontend/frontend.xml'
     if os.path.isfile(fname):
         print "Configuring frontend (%s). Frontend host %s, factory %s. New file: %s.new" % (fname, FRONTEND, FACTORY, fname)
