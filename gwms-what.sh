@@ -37,11 +37,11 @@ if ! $isfactory && ! $isfrontend; then
   exit
 fi
 
-fehost=$(grep vofrontend /etc/condor/certs/condor_mapfile | grep -v Mambelli)
-fehost=${fehost##*=}
+fehostlist=$(grep vofrontend /etc/condor/certs/condor_mapfile | grep -v Mambelli)
+fehost=${fehostlist##*=}  # getting the last one
 fehost=${fehost%\$*}
-fahost=$(grep factory /etc/condor/certs/condor_mapfile)
-fahost=${fahost##*=}
+fahostlist=$(grep factory /etc/condor/certs/condor_mapfile)
+fahost=${fahostlist##*=}   # getting the last one
 fahost=${fahost%\$*}
 
 cat << EOF

@@ -213,6 +213,9 @@ def frontend_config1(fname='/etc/gwms-frontend/frontend.xml'):
         XML_SECURITY = XML_SECURITY3
         XML_WMS_COLLECTOR = XML_WMS_COLLECTOR3
         XML_SCHEDD = XML_SCHEDD3
+    if USE_TOKEN:
+        # Using the host certificate to pass the certificate/proxy checks
+        XML_SECURITY.replace("/etc/gwms-frontend/fe_proxy", "/etc/grid-security/hostcert.pem")
     tree = ET.ElementTree()
     tree.parse(fname)
     # process_logs
@@ -265,8 +268,8 @@ GSI "^\/DC\=ch\/DC\=cern\/OU\=computers\/CN\=(host\/)?([A-Za-z0-9.\-]*)$" \\2@ce
 # old personal cert GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli$$" vofrontend_service
 # Fermilab cert GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
 HTC_CERTMAP_USER_DEFAULT = '''GSI "^/DC=org/DC=cilogon/C=US/O=Fermi National Accelerator Laboratory/OU=People/CN=Marco Mambelli/CN=UID:marcom" vofrontend_service 
-GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli\ 247$$" vofrontend_service'''
-
+GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=People\/CN\=Marco\ Mambelli\ 247$$" vofrontend_service
+'''
 # old default
 HTC_CERTMAP1 = '''GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${frontend}$$" vofrontend_service
 GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${factory}$$" gfactory
