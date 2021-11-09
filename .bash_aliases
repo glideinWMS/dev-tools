@@ -56,9 +56,13 @@ alias fclfactory='ssh root@gwms-dev-factory.fnal.gov'
 alias fclweb='ssh root@gwms-web.fnal.gov'
 alias slv='ssh-last ssh root U_vofrontend'
 alias slf='ssh-last ssh root U_factory'
+alias slce='ssh-last ssh root U_ce'
 alias fcl='ssh-last ssh root'
 alias fcl025='ssh root@fermicloud025.fnal.gov' 
 #alias sgweb='ssh root@gwms-web.fnal.gov'
+# htgettoken options: (-r pilot group pilot for wlcg, default) -i fermilab , -i fermilab-test, -i cms
+alias fclhtgettoken='htgettoken --minsecs=3580 -v -a fermicloud543.fnal.gov -o '
+alias fclhtgettokenfnal='htgettoken --minsecs=3580 -v -a fermicloud543.fnal.gov -i fermilab -o '
 
 ## For fermicloud hosts
 # GWMS log files
@@ -190,7 +194,7 @@ ssh-last() {
   [ "$sel" == "frontend" ] && sel=vofe
   [ "$sel" == "vofrontend" ] && sel=vofe
   [ "$sel" == "web" ] && sel=gwms-web
-  [ "$sel" == "ce" ] && sel=fermicloud025
+  #[ "$sel" == "ce" ] && sel=fermicloud025
   [[ "$sel" =~ ^[0-9]+$ ]] && sel="fermicloud$sel"
   if [ -n "$filteruser" ]; then
     myhost=$(grep "$filteruser" ~/.bashcache/fclhosts | grep "$sel" | head -n 1 | cut -d ' ' -f 3 )
