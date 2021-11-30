@@ -37,18 +37,22 @@ if ! $isfactory && ! $isfrontend; then
   exit
 fi
 
-fehostlist=$(grep vofrontend /etc/condor/certs/condor_mapfile | grep -v Mambelli)
-fehost=${fehostlist##*=}  # getting the last one
-fehost=${fehost%\$*}
+# Use the mapfile to find out the hosts. This is incorrect if hosts certificates are not used (tokens, user certificates, ...)
+# Get frontends and remove user IDs (also user certificated are mapped to the frontend user)
+fehostlist=$(grep vofrontend /etc/condor/certs/condor_mapfile | grep -v "CN=UID" | grep -v Mambelli)
+#fehost=${fehostlist##*=}  # getting the last one
+#fehost=${fehost%\$*}
+fehosts=$(echo "$fehostlist" | sed -e 's;.*=;;' -e 's;\$.*;;' | sed ':a; N; $!ba; s/\n/, /g')
 fahostlist=$(grep factory /etc/condor/certs/condor_mapfile)
-fahost=${fahostlist##*=}   # getting the last one
-fahost=${fahost%\$*}
+#fahost=${fahostlist##*=}   # getting the last one
+#fahost=${fahost%\$*}
+fahosts=$(echo "$fahostlist" | sed -e 's;.*=;;' -e 's;\$.*;;' | sed ':a; N; $!ba; s/\n/, /g')
 
 cat << EOF
 Setup:
 - this host: $(hostname)
-- Factory: $fahost $($isfactory && echo "(this)")
-- Frontend: $fehost $($isfrontend && echo "(this)")
+- Factory: $fahosts $($isfactory && echo "(this)")
+- Frontend: $fehosts $($isfrontend && echo "(this)")
 EOF
 
 # Print RPM versions if requested
