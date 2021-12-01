@@ -51,8 +51,8 @@ fahosts=$(echo "$fahostlist" | sed -e 's;.*=;;' -e 's;\$.*;;' | sed ':a; N; $!ba
 cat << EOF
 Setup:
 - this host: $(hostname)
-- Factory: $fahosts $($isfactory && echo "(this)")
-- Frontend: $fehosts $($isfrontend && echo "(this)")
+- Factory$($isfactory && echo "(this)"): $fahosts 
+- Frontend$($isfrontend && echo "(this)"): $fehosts 
 EOF
 
 # Print RPM versions if requested
