@@ -1,0 +1,8 @@
+GSI "/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=$FRONTEND_HOST" vofrontend_service
+GSI "/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=$FACTORY_HOST" gfactory
+GSI "/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=fermicloud489.fnal.gov" ce489
+GSI "/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=fermicloud528.fnal.gov" ce528
+GSI "/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=$FRONTEND_HOST" frontend
+GSI "$PILOT_DN" pilot
+GSI (.*) anonymous
+FS (.*) \1
