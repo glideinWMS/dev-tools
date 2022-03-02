@@ -42,13 +42,14 @@ class ShellSubprocess(object):
                 f"({cmd}) 1> {outfile.name} 2> {errfile.name}; echo $? > {exitfile.name}"
             )
 
-            wait_time = 0.00000001
+            wait_time = 0.0001
             while True:
                 exitfile.seek(0)
                 exit_code = exitfile.read()
                 if exit_code:
                     break
                 sleep(wait_time)
+                wait_time *= 2
 
             outfile.seek(0)
             out = outfile.read()
