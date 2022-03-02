@@ -1,3 +1,13 @@
+"""
+ShellSubprocess
+
+    This module is used to create and manage a bash shell in a subprocess.
+    Once instantiated, the shell can execute commands that will write to stdout and
+    stderr. Both buffers can be read with the read_stdout and read_stderr methods.
+    The subprocess should be terminated with the close method or used in a context
+    manager.
+"""
+
 import subprocess
 
 from time import sleep
@@ -17,6 +27,12 @@ class ShellSubprocess(object):
         )
         self.stdin = self.process.stdin
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
     def execute(self, cmd):
         """Execute a command in the shell.
 
@@ -31,7 +47,7 @@ class ShellSubprocess(object):
 
     def run(self, cmd):
         """Execute a command in the shell an return the stdout, stderr and exit code.
-        NOTE: This method clears the stdout and stderr buffers. TODO: Update this note.
+        NOTE: This method does not write to stdout or stderr buffers.
 
         Args:
             cmd (string, list): command to execute
