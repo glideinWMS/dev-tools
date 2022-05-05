@@ -104,7 +104,7 @@ sed -i "s/priority=[0-9]*/priority=1/g" /etc/yum.repos.d/osg*
 yum install $Y osg-ca-certs
 
 # Token Tools
-yum install htgettoken
+yum install $Y htgettoken
 
 # HTCondor
 yum install $Y condor.x86_64 --enablerepo="$OSG_REPO"
@@ -139,8 +139,6 @@ ls -lah "$VOFE_PROXY"
 ls -lah "$PILOT_PROXY"
 
 # Tokens
-echo Generating SciToken...
-htgettoken --minsecs=3580 -i fermilab -v -a fermicloud543.fnal.gov -o "$TOKEN_DIR"/"$HOSTNAME".scitoken
 echo Creating IDTOKENS...
 systemctl start condor
 sleep 5
@@ -151,6 +149,8 @@ chown -R frontend:frontend "$TOKEN_DIR"
 chmod 600 "$TOKEN_DIR"/*
 ls -lah "$TOKEN_DIR"
 systemctl stop condor
+echo Generating SciToken...
+htgettoken --minsecs=3580 -i fermilab -v -a fermicloud543.fnal.gov -o "$TOKEN_DIR"/"$HOSTNAME".scitoken
 
 # Update frontend configuration
 gwms-frontend upgrade
