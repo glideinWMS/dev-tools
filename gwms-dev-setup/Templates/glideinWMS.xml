@@ -56,7 +56,35 @@
          <monitorgroups>
          </monitorgroups>
       </entry>
-      <entry name="fermicloud489" enabled="True" gatekeeper="fermicloud489.fnal.gov fermicloud489.fnal.gov:9619" gridtype="condor" verbosity="std" work_dir="OSG" trust_domain="grid" auth_method="grid_proxy">
+      <entry name="fermicloud489_SciToken" enabled="True" gatekeeper="fermicloud489.fnal.gov fermicloud489.fnal.gov:9619" gridtype="condor" verbosity="std" work_dir="OSG" trust_domain="grid" auth_method="scitoken">
+         <config>
+            <max_jobs>
+               <per_entry held="1000" idle="4000" glideins="10000"/>
+               <default_per_frontend held="100" idle="400" glideins="5000"/>
+               <per_frontends>
+               </per_frontends>
+            </max_jobs>
+            <release max_per_cycle="20" sleep="0.2"/>
+            <remove max_per_cycle="5" sleep="0.2"/>
+            <restrictions require_voms_proxy="False"/>
+            <submit cluster_size="10" max_per_cycle="100" sleep="0.2"/>
+         </config>
+         <allow_frontends>
+         </allow_frontends>
+         <attrs>
+            <attr name="CONDOR_ARCH" const="False" glidein_publish="False" job_publish="False" parameter="True" publish="True" type="string" value="x86"/>
+            <attr name="CONDOR_OS" const="False" glidein_publish="False" job_publish="False" parameter="True" publish="True" type="string" value="rhel7"/>
+            <attr name="GLIDEIN_Site" const="True" glidein_publish="True" job_publish="True" parameter="True" publish="True" type="string" value="fermicloud489"/>
+            <attr const="False" glidein_publish="False" job_publish="False" name="CONDOR_VERSION" parameter="True" publish="True" type="string" value="$CONDOR_TARBALL_VERSION"/>
+         </attrs>
+         <files>
+         </files>
+         <infosys_refs>
+         </infosys_refs>
+         <monitorgroups>
+         </monitorgroups>
+      </entry>
+      <entry name="fermicloud489_GSI" enabled="True" gatekeeper="fermicloud489.fnal.gov fermicloud489.fnal.gov:9619" gridtype="condor" verbosity="std" work_dir="OSG" trust_domain="grid" auth_method="grid_proxy">
          <config>
             <max_jobs>
                <per_entry held="1000" idle="4000" glideins="10000"/>

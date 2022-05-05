@@ -10,6 +10,7 @@ FACTORY_XML=/etc/gwms-factory/glideinWMS.xml
 FACTORY_XML_TEMPLATE="$DIR"/Templates/glideinWMS.xml
 FACTORY_MAPFILE=/etc/condor/certs/condor_mapfile
 FACTORY_MAPFILE_TEMPLATE="$DIR"/Templates/factory_condor_mapfile
+TOKEN_DIR=/var/lib/gwms-factory/.condor/tokens.d
 CONDOR_TARBALL_VERSION=9.0.0
 CONDOR_TARBALL_PATH=/var/lib/gwms-factory/condor
 OSG_REPO=osg
@@ -120,7 +121,19 @@ envsubst < "$FACTORY_MAPFILE_TEMPLATE" > "/tmp/condor_mapfile"
 mv "/tmp/condor_mapfile" "$FACTORY_MAPFILE"
 echo Updated "$FACTORY_MAPFILE"
 
-# condor tarball
+# Tokens
+echo Creating IDTOKENS...
+systemctl start condor
+sleep 5
+mkdir -p "$TOKEN_DIR"
+condor_token_create -id gfactory@"$HOSTNAME" > "$TOKEN_DIR"/gfactory."$HOSTNAME".idtoken
+chown -R gfactory:gfactory "$TOKEN_DIR"
+chmod 600 "$TOKEN_DIR"/*
+condor_token_create -id vofrontend_service@"$HOSTNAME" -key POOL > ~/frontend."$HOSTNAME".idtoken
+ls -lah "$TOKEN_DIR"
+systemctl stop condor
+
+# Condor tarball
 [ ! -d $CONDOR_TARBALL_PATH ] && mkdir -p $CONDOR_TARBALL_PATH
 pushd $CONDOR_TARBALL_PATH || exit 3
 wget "$CONDOR_TARBALL_URL"
