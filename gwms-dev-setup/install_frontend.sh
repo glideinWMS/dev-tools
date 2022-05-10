@@ -145,12 +145,12 @@ sleep 5
 mkdir -p "$TOKEN_DIR"
 condor_token_create -id vofrontend_service@"$HOSTNAME" -key POOL > "$TOKEN_DIR"/frontend."$HOSTNAME".idtoken
 scp root@"$FACTORY_HOST":/root/frontend."$FACTORY_HOST".idtoken  "$TOKEN_DIR"/frontend."$FACTORY_HOST".idtoken
-chown -R frontend:frontend "$TOKEN_DIR"
-chmod 600 "$TOKEN_DIR"/*
-ls -lah "$TOKEN_DIR"
 systemctl stop condor
 echo Generating SciToken...
 htgettoken --minsecs=3580 -i fermilab -v -a fermicloud543.fnal.gov -o "$TOKEN_DIR"/"$HOSTNAME".scitoken
+chown -R frontend:frontend "$TOKEN_DIR"
+chmod 600 "$TOKEN_DIR"/*
+ls -lah "$TOKEN_DIR"
 
 # Update frontend configuration
 gwms-frontend upgrade
