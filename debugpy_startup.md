@@ -1,7 +1,4 @@
-# Debug Frontend
-```sh
-sudo -u frontend python3 -m debugpy --listen 0.0.0.0:5678 /opt/gwms-git/glideinwms/frontend/glideinFrontend.py /var/lib/gwms-frontend/vofrontend
-```
+# Visual Studio Code debug configuration
 
 ```json
 {
@@ -36,4 +33,14 @@ sudo -u frontend python3 -m debugpy --listen 0.0.0.0:5678 /opt/gwms-git/glideinw
         }
     ]
 }
+```
+
+# Debug Frontend
+```sh
+sudo -u frontend python3 -m debugpy --listen 0.0.0.0:5678 /opt/gwms-git/glideinwms/frontend/glideinFrontend.py /var/lib/gwms-frontend/vofrontend
+```
+
+# Debug Factory
+```sh
+(cd /var/lib/gwms-factory/work-dir; sudo -u gfactory python3 -m debugpy --listen 0.0.0.0:5678 /opt/gwms-git/glideinwms/factory/glideFactory.py /var/lib/gwms-factory/work-dir &)
 ```
