@@ -12,7 +12,7 @@ https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 sudo yum remove git
 
-sudo yum -y install  git224-all
+sudo yum -y install  git236
 
 
 # Exclude GlideinWMS packages from yum updates
