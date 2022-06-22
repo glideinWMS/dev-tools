@@ -30,7 +30,7 @@ fi
 # Clone GlideinWMS
 mkdir /opt/gwms-git
 cd /opt/gwms-git
-git clone ssh://p-glideinwms@cdcvs.fnal.gov/cvs/projects/glideinwms
+git clone https://github.com/glideinWMS/glideinwms.git
 
 if [ $(echo "$MYPYTHON" | cut -d "." -f 1) == "python3" ]
 then
