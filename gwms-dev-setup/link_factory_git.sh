@@ -32,7 +32,7 @@ mkdir /opt/gwms-git
 cd /opt/gwms-git
 git clone https://github.com/glideinWMS/glideinwms.git
 
-if [ $($MYPYTHON | cut -d '.' -f 1) == "python3" ]
+if [ $(echo "$MYPYTHON" | cut -d '.' -f 1) == "python3" ]
 then
     pushd glideinwms
     git checkout master

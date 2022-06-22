@@ -35,7 +35,7 @@ git clone ssh://p-glideinwms@cdcvs.fnal.gov/cvs/projects/glideinwms
 if [ $(echo "$MYPYTHON" | cut -d "." -f 1) == "python3" ]
 then
     pushd glideinwms
-    git checkout branch_v3_9
+    git checkout master
     popd
 fi
 
