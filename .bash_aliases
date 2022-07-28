@@ -232,8 +232,13 @@ fcldownload() {
   [ "$1" == "-x" ] && { make_exe=true; shift; }
   local dfile="$1"
   if [ -n "$dfile" ]; then
-    curl -L -o ~/"$dfile" "$GWMS_DEV_REPO/$dfile"
-    $make_exe && chmod +x  ~/"$dfile"
+    curl -L -o "$dfile" "$GWMS_DEV_REPO/$(basename "$dfile")"
+    if head -n 1  "$dfile" | grep -q "404: Not Found" ; then
+      echo "URL not found ($GWMS_DEV_REPO/$(basename "$dfile")). Removing file ("$dfile")."
+      rm "$dfile"
+    else
+      $make_exe && chmod +x "$dfile"
+    fi
   fi
 }
 
