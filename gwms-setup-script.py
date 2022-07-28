@@ -303,6 +303,8 @@ FS (.*) \\1
 # in-common certificates
 HTC_CERTMAP3 = '''GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}$$" vofrontend_service
 GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}$$" gfactory
+GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}$$" vofrontend_service
+GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}$$" gfactory
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=Illinois\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=IL\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@old.daemon.opensciencegrid.org
 GSI "^\/DC\=com\/DC\=DigiCert-Grid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
@@ -318,9 +320,11 @@ FS (.*) \\1
 HTC_CERTMAP_ALL = '''GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${frontend}$$" vofrontend_service
 GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${frontend}$$" vofrontend_service
 GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}$$" vofrontend_service
+GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}$$" vofrontend_service
 GSI "^\/DC\=com\/DC\=DigiCert\-Grid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${factory}$$" gfactory
 GSI "^\/DC\=org\/DC\=opensciencegrid\/O\=Open\ Science\ Grid\/OU\=Services\/CN\=${factory}$$" gfactory
 GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}$$" gfactory
+GSI "^/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}$$" gfactory
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=Illinois\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
 GSI "^\/DC\=org\/DC\=incommon\/C\=US\/ST\=IL\/L\=Batavia\/O\=Fermi\ Research\ Alliance\/OU\=Fermilab\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@old.daemon.opensciencegrid.org
 GSI "^\/DC\=com\/DC\=DigiCert-Grid\/O=Open Science Grid\/OU\=Services\/CN\=(host\/)?([A-Za-z0-9.\-]*)$$" \\2@daemon.opensciencegrid.org
