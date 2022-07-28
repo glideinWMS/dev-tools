@@ -19,19 +19,19 @@ onliner=$(hostname)
 # TODO: functions finding components from configuration and condor status, not mapfile that will be unreliable after x509 is gone
 
 findce() {
-  # find CEs in Factory configuration (entries) or condor_status
+  true  # find CEs in Factory configuration (entries) or condor_status
 }
 
 findfe() {
-  # find Frontends in the factory condor status
+  true  # find Frontends in the factory condor status
 }
 
 findfa() {
-  # find Factories in the configuration (or factory condor status?)
+  true  # find Factories in the configuration (or factory condor status?)
 }
 
 findde() {
-  # find DE in the Factory condor status
+  true  # find DE in the Factory condor status
 }
 
 # What is installed?
