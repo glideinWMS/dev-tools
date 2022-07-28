@@ -71,6 +71,7 @@ XML_SCHEDD1 = '            <schedd DN="/DC=com/DC=DigiCert-Grid/O=Open Science G
 XML_SCHEDD2 = '            <schedd DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" fullname="${frontend}"/>'
 XML_SCHEDD3 = '            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" fullname="${frontend}"/>'
 
+USE_TOKEN=False
 
 def is_osg_certificate(certfname="/etc/grid-security/hostcert.pem"):
     try:
