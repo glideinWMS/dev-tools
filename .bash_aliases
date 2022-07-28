@@ -8,6 +8,7 @@
 export GWMS_DEV_USER=${GWMS_DEV_USER:-$USER}
 # Modify the Git repo if desired
 export GWMS_DEV_REPO="https://raw.githubusercontent.com/glideinwms/dev-tools/master"
+export GWMS_DEV_REPO_GIT="https://github.com/glideinWMS/dev-tools.git"
 # Setup (init and update) add ~/.bash_aliases ~/.bashcache/fclhosts and some files in ~/bin/
 
 #alias mvim="/Applications/MacVim.app/contents/MacOS/MacVim"
@@ -228,6 +229,10 @@ ssh-init-host() {
 
 fcldownload() {
   # download from repo and make executable if -x is first parameter
+  if [ "$1" == clone ]; then
+    git clone $GWMS_DEV_REPO_GIT
+    return 0
+  fi
   local make_exe=false
   [ "$1" == "-x" ] && { make_exe=true; shift; }
   local dfile="$1"
