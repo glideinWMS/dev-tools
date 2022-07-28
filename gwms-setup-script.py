@@ -28,7 +28,7 @@ XML_LOG_BAD='<process_log backup_count="5" extension="bad" max_days="7.0" max_mb
 
 XML_COLLECTOR1 = '<collector DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
 XML_COLLECTOR2 = '<collector DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
-XML_COLLECTOR3 = '<collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
+XML_COLLECTOR3 = '<collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${factory}" comment="Define factory collector globally for simplicity" factory_identity="gfactory@${factory}" my_identity="vofrontend_service@${factory}" node="${factory}"/>'
 
 XML_SECURITY1 = '''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
       <credentials>
@@ -42,7 +42,7 @@ XML_SECURITY2 = '''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" pro
       </credentials>
    </security>
 '''
-XML_SECURITY3 = '''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
+XML_SECURITY3 = '''    <security classad_proxy="/etc/gwms-frontend/fe_proxy" proxy_DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
       <credentials>
          <credential absfname="/etc/gwms-frontend/mm_proxy" security_class="frontend" trust_domain="grid" type="grid_proxy"/>
       </credentials>
@@ -60,16 +60,18 @@ XML_WMS_COLLECTOR2 = '''   <collectors>
    </collectors>
 '''
 #/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=fermicloud315.fnal.gov
+#/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}
 XML_WMS_COLLECTOR3 = '''   <collectors>
-      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" group="default" node="${frontend}:9618" secondary="False"/>
-      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" group="default" node="${frontend}:9618?sock=collector1-40" secondary="True"/>
+      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" group="default" node="${frontend}:9618" secondary="False"/>
+      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" group="default" node="${frontend}:9618?sock=collector1-40" secondary="True"/>
    </collectors>
 '''
 
 
 XML_SCHEDD1 = '            <schedd DN="/DC=com/DC=DigiCert-Grid/O=Open Science Grid/OU=Services/CN=${frontend}" fullname="${frontend}"/>'
 XML_SCHEDD2 = '            <schedd DN="/DC=org/DC=opensciencegrid/O=Open Science Grid/OU=Services/CN=${frontend}" fullname="${frontend}"/>'
-XML_SCHEDD3 = '            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" fullname="${frontend}"/>'
+#XML_SCHEDD3 = '            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/L=Batavia/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" fullname="${frontend}"/>'
+XML_SCHEDD3 = '            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=${frontend}" fullname="${frontend}"/>'
 
 USE_TOKEN=False
 
