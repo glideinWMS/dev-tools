@@ -224,7 +224,17 @@ ssh-init-host() {
   #scp "$HOME"/prog/repos/git-gwms/gwms-tools/.bash_aliases ${huser}@${hname}: >/dev/null && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
   #ssh ${huser}@${hname}  "curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null" && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
   ssh ${huser}@${hname}  "curl -L -o ~/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null && . ~/.bash_aliases && aliases-update"
+}
 
+fcldownload() {
+  # download from repo and make executable if -x is first parameter
+  local make_exe=false
+  [ "$1" == "-x" ] && { make_exe=true; shift; }
+  local dfile="$1"
+  if [ -n "$dfile" ]; then
+    curl -L -o ~/"$dfile" "$GWMS_DEV_REPO/$dfile"
+    $make_exe && chmod +x  ~/"$dfile"
+  fi
 }
 
 fcl-fe-certs() {
