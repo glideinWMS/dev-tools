@@ -66,11 +66,13 @@ alias fclhtgettoken='htgettoken --minsecs=3580 -v -a fermicloud543.fnal.gov -o '
 alias fclhtgettokenfnal='htgettoken --minsecs=3580 -v -a fermicloud543.fnal.gov -i fermilab -o '
 
 ## For fermicloud hosts
-# GWMS log files
-alias gvmain='less /var/log/gwms-frontend/group_main/main.all.log'
-alias gvfe='less /var/log/gwms-frontend/frontend/frontend.all.log'
-alias gvfa='less /var/log/gwms-factory/server/factory/factory.all.log'
-alias gvg0='less /var/log/gwms-factory/server/factory/group_0.all.log'
+# GWMS log files (use [N]:n :p to navigate files)
+alias gvmain='less /var/log/gwms-frontend/group_main/main.*.log'
+alias gvfe='less /var/log/gwms-frontend/frontend/frontend.*.log'
+alias gvfa='less /var/log/gwms-factory/server/factory/factory.*.log'
+alias gvg0='less /var/log/gwms-factory/server/factory/group_0.*.log'
+alias gvel='ls /var/log/gwms-factory/server/ | grep entry'
+# gve is a function
 # HTCondor CondorView some log file, CondorCommand...
 alias cvcoll='less /var/log/condor/CollectorLog'
 alias cvsched='less /var/log/condor/SchedLog'
@@ -79,7 +81,7 @@ alias cvgm='less /var/log/condor/GridManagerLog.schedd_glideins*'
 alias cvcerts='less /etc/condor/certs/condor_mapfile'
 alias ccs='condor_status -any'
 alias ccsf='condor_status -any -af MyType Name'
-alias ccsl='condor_status -any -constraint 'MyType == "glidefactoryclient"' -af GlideinMonitorRequestedIdle GlideinMonitorRequestedMaxGlideins GlideinMonitorRequestedIdleCores GlideinMonitorRequestedMaxCores ReqEntryName Name'
+alias ccsl="condor_status -any -constraint 'MyType == \"glidefactoryclient\"' -af GlideinMonitorRequestedIdle GlideinMonitorRequestedMaxGlideins GlideinMonitorRequestedIdleCores GlideinMonitorRequestedMaxCores ReqEntryName Name"
 alias ccq='condor_q -global -allusers'
 #alias ccql='htc_foreach_schedd condor_q -af ClusterId ProcId GlideinEntryName GlideinClient JobStatus Cmd -name'
 alias ccql='htc_foreach_schedd -f1 condor_q -allusers -af ClusterId ProcId GlideinEntryName GlideinClient JobStatus Cmd -name'
@@ -143,6 +145,10 @@ gwms-test-job() {
     [[ "$PWD" = */condor-test ]] || cd condor-test/
     [[ -e "$job" ]] && condor_submit $job || ls *${job}*
   fi
+}
+
+gve() {
+  less /var/log/gwms-factory/server/entry_${1#entry_}/${1#entry_}.*.log
 }
 
 cd-with-memory() {
