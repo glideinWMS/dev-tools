@@ -19,6 +19,7 @@ VOFE_PROXY="$PROXY_DIR"/vofe_proxy
 PILOT_PROXY="$PROXY_DIR"/pilot_proxy
 OSG_REPO=osg
 FRONTEND_REPO=osg
+EXTRA_REPOS=
 
 # Argument parser
 while [ -n "$1" ];do
@@ -81,6 +82,9 @@ export TOKEN_DIR
 # EPEL Repo
 if [ -z "$EL8" ]; then
     yum install $Y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+else
+    # Alma8 requires powertools (alma8-powertools)
+    EXTRA_REPOS="$EXTRA_REPOS --enablerepo=powertools"
 fi
 
 # OSG Repo
@@ -101,17 +105,19 @@ sed -i "s/priority=[0-9]*/priority=1/g" /etc/yum.repos.d/osg*
 ### INSTALLATION ###
 
 # OSG
-yum install $Y osg-ca-certs
+yum install $Y osg-ca-certs $EXTRA_REPOS --enablerepo="$OSG_REPO"
 
 # Token Tools
-yum install $Y htgettoken
+yum install $Y htgettoken $EXTRA_REPOS --enablerepo="$OSG_REPO"
 
 # HTCondor
-yum install $Y condor.x86_64 --enablerepo="$OSG_REPO"
+yum install $Y condor.x86_64 $EXTRA_REPOS --enablerepo="$OSG_REPO"
 
 # Frontend
-yum install $Y glideinwms-vofrontend --enablerepo="$FRONTEND_REPO"
+yum install $Y glideinwms-vofrontend $EXTRA_REPOS --enablerepo="$FRONTEND_REPO"
 
+# Fermi extra
+yum install $Y fermilab-util_kx509
 
 ### CONFIGURATION ###
 
