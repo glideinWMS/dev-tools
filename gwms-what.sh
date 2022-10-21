@@ -52,7 +52,7 @@ if [[ -e /etc/gwms-frontend ]]; then
   echo "Found GWMS VO Frontend (/etc/gwms-frontend), version $fever"
 fi
 [[ -e /etc/condor ]] && { iscondor=true; echo "Found HTCondor (/etc/condor), version $(rpm -q condor)"; }
-[[ -e /etc/condor-ce ]] && { iscondorce=true; echo "Found HTCondor-CE (/etc/condor-ce), version $(rpm -q htcondor-ce)"; }
+[[ -e /etc/condor-ce ]] && { iscondorce=true; echo "Found HTCondor-CE (/etc/condor-ce), version $(rpm -q htcondor-ce), auth: $(condor_ce_config_val SEC_DEFAULT_AUTHENTICATION_METHODS)"; }
 if [[ -e /etc/decisionengine ]]; then
   isdecisionengine=true
   dever=$(yum list installed decisionengine | grep decisionengine | xargs echo | cut -d ' ' -f 2)
