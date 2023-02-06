@@ -28,6 +28,8 @@ alias cdgwms='cd prog/repos/git-gwms/'
 alias cdm='cd-with-memory'
 alias pushdm='cd-with-memory pushd'
 alias dictlist='curl dict://dict.org/show:db'
+# From https://gist.github.com/angelo-v/e0208a18d455e2e6ea3c40ad637aac53
+alias jwtdecode='jq -R '"'"'gsub("-";"+") | gsub("_";"/") | split(".") | .[0],.[1] | @base64d | fromjson'"'"
 alias infoalias='
 echo -e "Aliases defined:\n General: lt cpv ve va dfh cl cdm pushdm cg dict dictlist"
 echo " To connect to fermicloud: fcl... slv slf sgweb fcl-fe-certs (proxy-creds renewal)"
@@ -131,6 +133,11 @@ cl() {
   DIR="$*";
   [ $# -lt 1 ] && DIR=$HOME
   builtin cd "${DIR}" && ls -F --color=auto
+}
+
+ts2date() {
+  # Unix timestamp to date conversion. Requires jq
+  [[ -n "$1" ]] && { jq 'todate' <<< $1 ; true;} || jq 'todate'
 }
 
 gwms-test-job() {
