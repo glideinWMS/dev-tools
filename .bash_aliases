@@ -95,7 +95,7 @@ alias ccrmg4='su -c "condor_rm -name schedd_glideins4@$HOSTNAME -all" - gfactory
 alias ccrma='htc_foreach_schedd condor_rm -all -name'
 
 ## These are for root on fermicloud hosts
-# GWMS manage
+# GWMS manage and troubleshoot
 alias festart='/bin/systemctl start gwms-frontend'
 alias festartall='for s in fetch-crl-cron httpd condor gwms-frontend fetch-crl-boot; do echo "Starting $s"; /bin/systemctl start $s; done'
 alias festop='/bin/systemctl stop gwms-frontend'
@@ -103,6 +103,8 @@ alias fereconfig='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend rec
 alias feupgrade='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend upgrade; /bin/systemctl start gwms-frontend'
 alias fecredrenewal='fcl-fe-certs'  # alias to make it easy to find - renew proxy from certs/creds
 alias fetest='su -c "cd condor-test/; condor_submit test-vanilla.sub" -'
+alias feccq='CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_q -debug -global -allusers'
+alias fecca='CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_advertise -debug'
 alias fastart='/bin/systemctl start gwms-factory'
 alias fastartall='for s in fetch-crl-cron httpd condor gwms-factory fetch-crl-boot; do echo "Starting $s"; /bin/systemctl start $s; done'
 alias fastop='/bin/systemctl stop gwms-factory'
@@ -136,6 +138,7 @@ cl() {
 }
 
 ts2date() {
+  # Using function so it can be both on the line or piped
   # Unix timestamp to date conversion. Requires jq
   [[ -n "$1" ]] && { jq 'todate' <<< $1 ; true;} || jq 'todate'
 }
@@ -181,6 +184,31 @@ cd-with-memory() {
       echo "No last dir available"
       false
     fi
+  fi
+}
+
+get-glidein-dir-last() {
+  # -u user -r root_dir (/tmp) -l
+  local local OPTIND option user root_dir=/tmp
+  local do_list=false
+  while getopts u:r:lh option ; do
+    case "${option}" in
+      h) echo "get-glidein-dir-last -l"; echo "get-glidein-dir-last [-u user][-r root_dir (default:/tmp)]"; return;;
+      r) root_dir="${OPTARG}";;
+      u) user="${OPTARG}";;
+      l) do_list=true;;
+      *) echo "Bad option: ${option}"; false; return;
+    esac
+  done
+  shift $((OPTIND-1))
+  if $do_list; then
+    ls -ldt "$root_dir"/glide_*
+    return
+  fi
+  if [[ -z "$user" ]]; then
+    echo "$(ls -dt "$root_dir"/glide_* | head -n 1)"
+  else
+    echo "$(find "$root_dir" -maxdepth 1 -name 'glide_*' -user $user -printf "%T@,%p\n" | sort -r | head -n1 | cut -d, -f2)"
   fi
 }
 
