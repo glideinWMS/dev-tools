@@ -1,19 +1,58 @@
 #!/bin/bash
 
+# script timeout value in seconds (add 1s before SIGKILL) 
+SCRIPT_TIMEOUT=15
+
 usage() {
   cat << EOF
 $0 [options]
 Print GlideinWMS software info (installed sw, related hosts, ...)
-Options:
+Options (only one of):
  -h	print this message
- -r	print also RPM packages available in various yum repositories
+ -n	no timeout
+ -r	print also RPM packages available in various yum repositories (no timeout)
 EOF
 }
 
 # Process options
 [[ "$1" = "-h" ]] && { usage; exit 0; }
 
-onliner=$(hostname)
+if [[ "$1" = "-n" ]]; then
+  SCRIPT_TIMEOUT=0
+  shift
+fi
+
+# Script timeout handling and watchdog
+_cleanup() {
+  echo "gwms-what.sh timed out. Output unavailable."
+  exit 1
+}
+
+if [[ "$SCRIPT_TIMEOUT" -gt 0 ]]; then
+
+  trap _cleanup SIGTERM
+
+  # Adding 10+1s timeout from http://www.bashcookbook.com/bashinfo/source/bash-4.0/examples/scripts/timeout3
+  # kill -0 pid   Exit code indicates if a signal may be sent to $pid process.
+  (
+    ((t = $SCRIPT_TIMEOUT))
+
+    while ((t > 0)); do
+        sleep 1
+        kill -0 $$ || exit 0
+        ((t -= 1))
+    done
+
+    # Be nice, post SIGTERM first, then wait 1 more second.
+    # The 'exit 0' below will be executed if any preceeding command fails.
+    echo "gwms-what.sh timed out. Output unavailable."
+    kill -s SIGTERM $$ && kill -0 $$ || exit 0
+    sleep 1
+    kill -s SIGKILL $$
+  ) 2> /dev/null &
+
+fi
+
 
 ########
 # TODO: functions finding components from configuration and condor status, not mapfile that will be unreliable after x509 is gone
@@ -33,6 +72,8 @@ findfa() {
 findde() {
   true  # find DE in the Factory condor status
 }
+
+
 
 # What is installed?
 isfactory=false
@@ -62,8 +103,8 @@ if [[ -e /etc/decisionengine ]]; then
   echo "Found DE (/etc/decisionengine), version $dever"
 fi
 
-if ! $isfactory && ! $isfrontend; then
-  echo "No GWMS Factory or Frontend found"
+if ! $isfactory && ! $isfrontend && ! $isdecisionengine; then
+  echo "No DE, GWMS Factory or Frontend found"
   exit
 fi
 
@@ -90,7 +131,7 @@ EOF
 
 # Print RPM versions if requested
 [[ "$1" = "-r" ]] || exit 0
-echo "Calculating available RPMs ..."
+echo "Calculating available glideinwms RPMs ..."
 gvers=$(yum list --enablerepo=osg-upcoming,osg-upcoming-development,osg-development,osg-contrib --show-duplicates available glideinwms-libs)
 cat << EOF
 - osg (productions): $(echo "$gvers" | grep "osg " | tail -n 1 | xargs echo | cut -d ' ' -f2)
