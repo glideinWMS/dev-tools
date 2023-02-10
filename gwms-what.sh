@@ -43,19 +43,22 @@ iscondorce=false
 
 if [[ -e /etc/gwms-factory ]]; then
   isfactory=true
-  faver=$(yum list installed glideinwms-factory | grep factory | xargs echo | cut -d ' ' -f 2)
+  faver=$(rpm -q glideinwms-factory)
+  faver="${faver#glideinwms-factory-}"
   echo "Found GWMS Factory (/etc/gwms-factory), version $faver"
 fi
 if [[ -e /etc/gwms-frontend ]]; then
   isfrontend=true
-  fever=$(yum list installed glideinwms-vofrontend | grep vofrontend | xargs echo | cut -d ' ' -f 2)
+  fever=$(rpm -q glideinwms-vofrontend)
+  fever="${fever#glideinwms-vofrontend-}"
   echo "Found GWMS VO Frontend (/etc/gwms-frontend), version $fever"
 fi
 [[ -e /etc/condor ]] && { iscondor=true; echo "Found HTCondor (/etc/condor), version $(rpm -q condor)"; }
 [[ -e /etc/condor-ce ]] && { iscondorce=true; echo "Found HTCondor-CE (/etc/condor-ce), version $(rpm -q htcondor-ce), auth: $(condor_ce_config_val SEC_DEFAULT_AUTHENTICATION_METHODS)"; }
 if [[ -e /etc/decisionengine ]]; then
   isdecisionengine=true
-  dever=$(yum list installed decisionengine | grep decisionengine | xargs echo | cut -d ' ' -f 2)
+  dever=$(rpm -q decisionengine)
+  dever="${dever#decisionengine-}"
   echo "Found DE (/etc/decisionengine), version $dever"
 fi
 
