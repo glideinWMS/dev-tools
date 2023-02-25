@@ -335,7 +335,7 @@ EOF
   # copy also some binaries
   mkdir -p "$HOME"/.fclcache
   mkdir -p "$HOME"/bin
-  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-proxies.sh myhosts.sh 99_debug.config; do
+  for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-auth.sh gwms-check-proxies.sh myhosts.sh 99_debug.config; do
     curl -L -o $HOME/bin/$i $GWMS_DEV_REPO/$i 2>/dev/null && chmod +x $HOME/bin/$i
     [[ $? -ne 0 ]] && echo "Error downloading $i. Continuing."
   done
