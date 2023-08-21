@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 
 # Before running XML functions
@@ -76,6 +76,7 @@ XML_SCHEDD3 = '            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fe
 USE_TOKEN=False
 
 def is_osg_certificate(certfname="/etc/grid-security/hostcert.pem"):
+    s2="NOERR"
     try:
         p = subprocess.Popen("openssl x509 -noout -subject -in %s" % certfname, shell=True, 
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -83,8 +84,8 @@ def is_osg_certificate(certfname="/etc/grid-security/hostcert.pem"):
         subj = s1[9:].strip()
         return "DC=opensciencegrid" in subj
     except:
-        print "Error evaluating host certificate: %s" % s2
-        print "Considering DigiCert certificates"
+        print("Error evaluating host certificate: %s" % s2)
+        print("Considering DigiCert certificates")
     return False
 
 def is_incommon_certificate(certfname="/etc/grid-security/hostcert.pem"):
@@ -95,8 +96,8 @@ def is_incommon_certificate(certfname="/etc/grid-security/hostcert.pem"):
         subj = s1[9:].strip()
         return "DC=incommon" in subj
     except:
-        print "Error evaluating host certificate: %s" % s2
-        print "Considering DigiCert certificates"
+        print("Error evaluating host certificate: %s" % s2)
+        print("Considering DigiCert certificates")
     return False
 
 HTC_TARBALLS1 = """   <condor_tarballs>
@@ -159,9 +160,9 @@ def factory_add(entry, fname='/etc/gwms-factory/glideinWMS.xml'):
     # to avoid duplicates w/ same name
     for i in list(elem.getchildren()):
         if i.get('name')==entry:
-            print "Entry %s already there. Removing it." % entry
+            print("Entry %s already there. Removing it." % entry)
             elem.remove(i)
-    print "Adding entry (to %s.new): %s" % (fname, entry)
+    print("Adding entry (to %s.new): %s" % (fname, entry))
     elem.append(ET.XML(ENTRIES[entry]))
     tree.write("%s.new" % fname)
     
@@ -173,25 +174,25 @@ def factory_remove(entry, fname='/etc/gwms-factory/glideinWMS.xml'):
     not_found = True
     for i in list(elem.getchildren()):
         if i.get('name')==entry:
-            print "Removing entry: %s" % entry
+            print("Removing entry: %s" % entry)
             not_found = False
             elem.remove(i)
     if not_found:
-        print "Entry %s not found" % entry
+        print("Entry %s not found" % entry)
     else:
-        print "The new content is in: %s" % fname
+        print("The new content is in: %s" % fname)
         tree.write("%s.new" % fname)
 
 
 def factory_list(fname='/etc/gwms-factory/glideinWMS.xml'):
-    print "All available entries: %s" % ENTRIES.keys()
+    print("All available entries: %s" % ENTRIES.keys())
     tree = ET.ElementTree()
     tree.parse(fname)
     e_list = []
     elem = tree.find('entries')
     for i in elem.getchildren():
         e_list.append(i.get('name'))
-    print "Entries in Factory: %s" % e_list
+    print("Entries in Factory: %s" % e_list)
 
 
 def frontend_config1(fname='/etc/gwms-frontend/frontend.xml'):
@@ -757,13 +758,13 @@ ENTRIES = {'old_ITB_FC_CE2': """      <entry name="ITB_FC_CE2" auth_method="grid
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "Setup a GWMS Factory or Frontend on Fernicloud. "
-        print "Set  X509_USER_SUBJECT in advance w/ the user/VO subject used for pilots proxies: may contain multiple subjeccts, one per line, escaped or not. Does not have a newline at the end"
-        print "Set  HTC_VER in advance w/ a specific HTCondor version if you don't want the default"
-        print "%s factory# frontend#   : number or full hostname (no domain). setup used in installation, do not run it multiple times" % sys.argv[0]
-        print "%s -a ENTRY_NAME        : add an entry" % sys.argv[0]
-        print "%s -d ENTRY_NAME        : remove an entry" % sys.argv[0]
-        print "%s -l entries           : list current entries (available and in factory)" % sys.argv[0]
+        print("Setup a GWMS Factory or Frontend on Fernicloud. ")
+        print("Set  X509_USER_SUBJECT in advance w/ the user/VO subject used for pilots proxies: may contain multiple subjeccts, one per line, escaped or not. Does not have a newline at the end")
+        print("Set  HTC_VER in advance w/ a specific HTCondor version if you don't want the default")
+        print("%s factory# frontend#   : number or full hostname (no domain). setup used in installation, do not run it multiple times" % sys.argv[0])
+        print("%s -a ENTRY_NAME        : add an entry" % sys.argv[0])
+        print("%s -d ENTRY_NAME        : remove an entry" % sys.argv[0])
+        print("%s -l entries           : list current entries (available and in factory)" % sys.argv[0])
         exit(1)
     special_command=True
     if sys.argv[1]=='-a':
@@ -791,20 +792,20 @@ if __name__ == "__main__":
         if not HTC_VERSION:
             HTC_VERSION = None
         else:
-            print "HTCondor version from the environment HTC_VER=%s" % HTC_VERSION
+            print("HTCondor version from the environment HTC_VER=%s" % HTC_VERSION)
     except KeyError:
         HTC_VERSION = None
     fname='/etc/gwms-frontend/frontend.xml'
     if os.path.isfile(fname):
-        print "Configuring frontend (%s). Frontend host %s, factory %s. New file: %s.new" % (fname, FRONTEND, FACTORY, fname)
+        print("Configuring frontend (%s). Frontend host %s, factory %s. New file: %s.new" % (fname, FRONTEND, FACTORY, fname))
         frontend_config1(fname)
-        print "Writing HTC mapfile (/etc/condor/certs/condor_mapfile1)"
+        print("Writing HTC mapfile (/etc/condor/certs/condor_mapfile1)")
         write_htc_map()
     fname='/etc/gwms-factory/glideinWMS.xml'
     if os.path.isfile(fname):
-        print "Configuring factory (%s). Frontend host %s, factory %s. New file: %s.new" % (fname, FRONTEND, FACTORY, fname)
+        print("Configuring factory (%s). Frontend host %s, factory %s. New file: %s.new" % (fname, FRONTEND, FACTORY, fname))
         factory_config1(fname)
-        print "Writing HTC mapfile"
+        print("Writing HTC mapfile")
         write_htc_map()
   
 
@@ -851,7 +852,7 @@ elem = tree.find('entries')
 for i in elem.getchildren():
         e_list.append(i.get('name'))
 
-print "Entries in Factory: %s" % e_list
+print("Entries in Factory: %s" % e_list)
 
 
 # ADD
@@ -859,20 +860,20 @@ elem = tree.find('entries')
 # to avoid duplicates w/ same name
 for i in list(elem.getchildren()):
         if i.get('name')==entry:
-            print "Entry %s already there. Removing it." % entry
+            print("Entry %s already there. Removing it." % entry)
             elem.remove(i)
 
-print "Adding entry: %s" % entry
+print("Adding entry: %s" % entry)
 elem.append(ET.XML(ENTRIES[entry]))
     
     else:
-        print "Entry %s not found" % entry
+        print("Entry %s not found" % entry)
 
 # REMOVE
 elem = tree.find('entries')
 for i in list(elem.getchildren()):
         if i.get('name')==entry:
-            print "Removing entry: %s" % entry
+            print("Removing entry: %s" % entry)
             elem.remove(i)
 
 """
