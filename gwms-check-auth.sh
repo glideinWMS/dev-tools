@@ -1,6 +1,6 @@
 #!/bin/bash
 # Check the validity of authentications
-# - host certificate 
+# - host certificate
 # - frontend and factory proxies (*proxy in /etc/gwms-frontend and /etc/gwms-factory)
 # - condor idtokens tokens (for users condor, frontend, gfactory, decisioengine)
 # - custom provided files or directories
@@ -535,40 +535,56 @@ if $DO_DEFAULT; then
         log_warn "It's recommended to run as root. Running as regular user you may not have access to some certificate or token."
     fi
 
-    out_verbose "*** Checking host certificate"
-    #openssl x509 -noout -subject -dates -in /etc/grid-security/hostcert.pem
-    #output=$(openssl x509 -noout -subject -dates -in /etc/grid-security/hostcert.pem 2>/dev/null)
-    #echo "/etc/grid-security/hostcert.pem valid for sec: $seconds_to_expire"
-    #if [ $seconds_to_expire -le 0 ]; then
-    #  echo "!!! renew host certificate"
-    #  ftc="$ftc /etc/grid-security/hostcert.pem"
-    #fi
-    # host cert, has 644 permission, using NO
-    if ! check_x509 /etc/grid-security/hostcert.pem '' NO ; then
-        ftc="$ftc,/etc/grid-security/hostcert.pem;"
+    if [[ -r /etc/grid-security/hostcert.pem ]]; then
+        out_verbose "*** Found host certificate, checking"
+        #openssl x509 -noout -subject -dates -in /etc/grid-security/hostcert.pem
+        #output=$(openssl x509 -noout -subject -dates -in /etc/grid-security/hostcert.pem 2>/dev/null)
+        #echo "/etc/grid-security/hostcert.pem valid for sec: $seconds_to_expire"
+        #if [ $seconds_to_expire -le 0 ]; then
+        #  echo "!!! renew host certificate"
+        #  ftc="$ftc /etc/grid-security/hostcert.pem"
+        #fi
+        # host cert, has 644 permission, using NO
+        if ! check_x509 /etc/grid-security/hostcert.pem '' NO ; then
+            ftc="$ftc,/etc/grid-security/hostcert.pem;"
+        fi
+    else
+        out_verbose "*** Host certificate ('/etc/grid-security/hostcert.pem') not found"
     fi
 
-    #echo "Checking frontend as $FRONTEND_USER"
-    # factory or frontend user may not be there
-    out_verbose "*** Checking frontend"
+    # Checking condor (also HTCondor-CE?)
+    if [[ -d /etc/condor ]]; then
+        out_verbose "*** Found HTCSS/HTCondor, checking '/etc/condor/tokens.d/'"
+        for i in /etc/condor/tokens.d/*; do
+            [[ ! -e "$i" ]] && continue
+            if ! check_token "$i"; then
+                ftc="$ftc,$i"
+            fi
+        done
+    fi
 
-    for i in /etc/gwms-frontend/*proxy*; do
-        [[ ! -e "$i" ]] && continue
-        #su $FRONTEND_USER -c "voms-proxy-info -all -file $i"
-        if ! check_x509 "$i" "$FRONTEND_USER"; then
-            ftc="$ftc, $i"
-        fi
-    done
+    if [[ -d /etc/gwms-frontend ]]; then
+        out_verbose "*** Found Frontend, checking '/etc/gwms-frontend/*proxy*'"
+        for i in /etc/gwms-frontend/*proxy*; do
+            [[ ! -e "$i" ]] && continue
+            #su $FRONTEND_USER -c "voms-proxy-info -all -file $i"
+            if ! check_x509 "$i" "$FRONTEND_USER"; then
+                ftc="$ftc,$i"
+            fi
+        done
+    fi
 
-    #echo "Checking factory as $FACTORY_USER"
-    out_verbose "*** Checking factory"
-    for i in /etc/gwms-factory/*proxy*; do
-        [ ! -e "$i" ] && continue
-        #su $FACTORY_USER -c "voms-proxy-info -all -file $i"
-        if ! check_x509 "$i" "$FACTORY_USER"; then
-            ftc="$ftc,$i"
-        fi
-    done
+    if [[ -d /etc/gwms-factory ]]; then
+        out_verbose "*** Found Factory, checking '/etc/gwms-factory/*proxy*'"
+        #echo "Checking factory as $FACTORY_USER"
+        for i in /etc/gwms-factory/*proxy*; do
+            [ ! -e "$i" ] && continue
+            #su $FACTORY_USER -c "voms-proxy-info -all -file $i"
+            if ! check_x509 "$i" "$FACTORY_USER"; then
+                ftc="$ftc,$i"
+            fi
+        done
+    fi
 fi
 
 # Check user tokens
@@ -588,7 +604,7 @@ do
             fi
         done
     else
-	log_debug "Home directory not found: '~$i'"
+	    log_debug "Home directory not found: '~$i'"
     fi
 done
 
