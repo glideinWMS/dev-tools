@@ -1,4 +1,4 @@
-<frontend advertise_delay="5" advertise_with_multiple="True" advertise_with_tcp="True" downtimes_file="frontenddowntime" frontend_monitor_index_page="False" frontend_name="$FRONTEND_NAME" frontend_versioning="False" group_parallel_workers="2" loop_delay="60" restart_attempts="3" restart_interval="1800">
+<frontend advertise_delay="5" advertise_with_multiple="True" advertise_with_tcp="True" downtimes_file="frontenddowntime" enable_attribute_expansion="False" frontend_monitor_index_page="False" frontend_name="$FRONTEND_NAME" frontend_versioning="False" group_parallel_workers="2" loop_delay="60" restart_attempts="3" restart_interval="1800">
    <config ignore_down_entries="False">
       <idle_vms_total curb="200" max="1000"/>
       <idle_vms_total_global curb="200" max="1000"/>
@@ -20,23 +20,23 @@
          <match_attrs>
          </match_attrs>
          <collectors>
-            <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=$FACTORY_HOST" comment="Test Factory" factory_identity="gfactory@$FACTORY_HOST" my_identity="vofrontend_service@$FACTORY_HOST" node="$FACTORY_HOST"/>
+            <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/CN=$FACTORY_HOST" comment="Factory EL7 - FC849" factory_identity="gfactory@$FACTORY_HOST" my_identity="vofrontend_service@$FACTORY_HOST" node="$FACTORY_HOST"/>
          </collectors>
       </factory>
       <job comment="Define job constraint and schedds globally for simplicity" query_expr="(JobUniverse==5)&amp;&amp;(GLIDEIN_Is_Monitor =!= TRUE)&amp;&amp;(JOB_Is_Monitor =!= TRUE)">
          <match_attrs>
          </match_attrs>
          <schedds>
-            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=$FRONTEND_HOST" fullname="$FRONTEND_HOST"/>
+            <schedd DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/CN=$FRONTEND_HOST" fullname="$FRONTEND_HOST"/>
          </schedds>
       </job>
    </match>
    <monitor base_dir="/var/lib/gwms-frontend/web-area/monitor" flot_dir="/usr/share/javascriptrrd/flot" javascriptRRD_dir="/usr/share/javascriptrrd/js" jquery_dir="/usr/share/javascriptrrd/flot"/>
    <monitor_footer display_txt="" href_link=""/>
-   <security classad_proxy="$VOFE_PROXY" comment="Test Factory at $FRONTEND_HOST" proxy_DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=$FRONTEND_HOST" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
+   <security classad_proxy="$VOFE_PROXY" proxy_DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/CN=$FRONTEND_HOST" proxy_selection_plugin="ProxyAll" security_name="vofrontend_service" sym_key="aes_256_cbc">
       <credentials>
          <credential absfname="$PILOT_PROXY" security_class="frontend" trust_domain="grid" type="grid_proxy"/>
-         <credential absfname="$TOKEN_DIR/$HOSTNAME.scitoken" security_class="frontend" trust_domain="grid" type="scitoken"/>
+         <credential absfname="$PILOT_SCITOKEN" security_class="frontend" trust_domain="grid" type="scitoken"/>
       </credentials>
    </security>
    <stage base_dir="/var/lib/gwms-frontend/web-area/stage" use_symlink="True" web_base_url="http://$FRONTEND_HOST/vofrontend/stage"/>
@@ -46,9 +46,9 @@
       <attr name="GLIDECLIENT_Rank" glidein_publish="False" job_publish="False" parameter="True" type="string" value="1"/>
       <attr name="GLIDEIN_Expose_Grid_Env" glidein_publish="True" job_publish="True" parameter="False" type="string" value="True"/>
       <attr name="GLIDEIN_Glexec_Use" glidein_publish="True" job_publish="True" parameter="False" type="string" value="OPTIONAL"/>
+      <attr name="USE_MATCH_AUTH" glidein_publish="False" job_publish="False" parameter="True" type="string" value="True"/>
       <attr name="GLIDEIN_Singularity_Use" glidein_publish="True" job_publish="True" parameter="False" type="string" value="PREFERRED"/>
       <attr name="SINGULARITY_IMAGES_DICT" glidein_publish="True" job_publish="True" parameter="False" type="string" value="default:/cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el6:latest,rhel7:/cvmfs/singularity.opensciencegrid.org/opensciencegrid/osgvo-el7:latest"/>
-      <attr name="USE_MATCH_AUTH" glidein_publish="False" job_publish="False" parameter="True" type="string" value="True"/>
    </attrs>
    <groups>
       <group name="main" enabled="True">
@@ -89,8 +89,8 @@
    <ccbs>
    </ccbs>
    <collectors>
-      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=$FRONTEND_HOST" group="default" node="$FRONTEND_HOST:9618" secondary="False"/>
-      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/OU=Fermilab/CN=$FRONTEND_HOST" group="default" node="$FRONTEND_HOST:9618?sock=collector1-40" secondary="True"/>
+      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/CN=$FRONTEND_HOST" group="default" node="$FRONTEND_HOST:9618" secondary="False"/>
+      <collector DN="/DC=org/DC=incommon/C=US/ST=Illinois/O=Fermi Research Alliance/CN=$FRONTEND_HOST" group="default" node="$FRONTEND_HOST:9618?sock=collector1-40" secondary="True"/>
    </collectors>
    <files>
       <file absfname="/var/lib/gwms-frontend/web-base/frontend/default_singularity_wrapper.sh" after_entry="True" after_group="False" const="True" executable="False" period="0" prefix="GLIDEIN_PS_" untar="False" wrapper="True">
