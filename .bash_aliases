@@ -25,14 +25,14 @@ alias gitmodified="git status | grep modified | awk '{print \$2}' | tr $'\n' ' '
 alias gitgraph='git log --all --decorate --oneline --graph'
 alias cg='cd `git rev-parse --show-toplevel`'
 alias cdgwms='cd prog/repos/git-gwms/'
-alias cdm='cd-with-memory'
-alias pushdm='cd-with-memory pushd'
+alias cdm='cd_with_memory'
+alias pushdm='cd_with_memory pushd'
 alias dictlist='curl dict://dict.org/show:db'
 # From https://gist.github.com/angelo-v/e0208a18d455e2e6ea3c40ad637aac53
 alias jwtdecode='jq -R '"'"'gsub("-";"+") | gsub("_";"/") | split(".") | .[0],.[1] | @base64d | fromjson'"'"
 alias infoalias='
 echo -e "Aliases defined:\n General: lt cpv ve va dfh cl cdm pushdm cg dict dictlist"
-echo " To connect to fermicloud: fcl... slv slf sgweb fcl-fe-certs (proxy-creds renewal)"
+echo " To connect to fermicloud: fcl... slv slf sgweb fcl_fe_certs (proxy-creds renewal)"
 echo " GWMS: gv.. fe.. fa.."
 echo " HTCondor: cv.. cc.. htc_.."
 echo " infoalias, fclinit"
@@ -50,17 +50,17 @@ alias fcltokendelete="ssh -t -K $GWMS_DEV_USER@openstackuigpvm01.fnal.gov  'rm -
 #alias fclrefreshhosts="ssh -K marcom@fcluigpvm01.fnal.gov  '~marcom/bin/myhosts -r' > ~/.bashcache/fclhosts"
 alias fclrefreshhosts="ssh -K $GWMS_DEV_USER@openstackuigpvm01.fnal.gov  '~/bin/myhosts.sh' > ~/.bashcache/fclhosts"
 alias fclhosts='cat ~/.bashcache/fclhosts'
-alias fclinit='ssh-init-host'
+alias fclinit='ssh_init_host'
 alias fclinfo='gwms-what.sh'
 #alias fclui='ssh marcom@fermicloudui.fnal.gov'
 alias fclui="ssh $GWMS_DEV_USER@openstackuigpvm01.fnal.gov"
 alias fclvofrontend='ssh root@gwms-dev-frontend.fnal.gov'
 alias fclfactory='ssh root@gwms-dev-factory.fnal.gov'
 alias fclweb='ssh root@gwms-web.fnal.gov'
-alias slv='ssh-last ssh root U_vofrontend'
-alias slf='ssh-last ssh root U_factory'
-alias slce='ssh-last ssh root U_ce'
-alias fcl='ssh-last ssh root'
+alias slv='ssh_last ssh root U_vofrontend'
+alias slf='ssh_last ssh root U_factory'
+alias slce='ssh_last ssh root U_ce'
+alias fcl='ssh_last ssh root'
 alias fcl025='ssh root@fermicloud025.fnal.gov' 
 #alias sgweb='ssh root@gwms-web.fnal.gov'
 # htgettoken options: (-r pilot group pilot for wlcg, default) -i fermilab , -i fermilab-test, -i cms
@@ -101,7 +101,7 @@ alias festartall='for s in fetch-crl-cron httpd condor gwms-frontend fetch-crl-b
 alias festop='/bin/systemctl stop gwms-frontend'
 alias fereconfig='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend reconfig; /bin/systemctl start gwms-frontend'
 alias feupgrade='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend upgrade; /bin/systemctl start gwms-frontend'
-alias fecredrenewal='fcl-fe-certs'  # alias to make it easy to find - renew proxy from certs/creds
+alias fecredrenewal='fcl_fe_certs'  # alias to make it easy to find - renew proxy from certs/creds
 alias fetest='su -c "cd condor-test/; condor_submit test-vanilla.sub" -'
 alias feccq='CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_q -debug -global -allusers'
 alias fecca='CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_advertise -debug'
@@ -143,8 +143,8 @@ ts2date() {
   [[ -n "$1" ]] && { jq 'todate' <<< $1 ; true;} || jq 'todate'
 }
 
-gwms-test-job() {
-  [[ "$1" = "-h" ]] && { echo -e "gwms-test-job [-h | USER [-l | SUBMIT_FILE]]\nSubmitting condor jobs from the USER's ~/condor-test/ directory"; return; }
+gwms_test_job() {
+  [[ "$1" = "-h" ]] && { echo -e "gwms_test_job [-h | USER [-l | SUBMIT_FILE]]\nSubmitting condor jobs from the USER's ~/condor-test/ directory"; return; }
   local juser=${1:-$GWMS_DEV_USER}
   [[ "$2" = "-l" ]] && { su -c "cd condor-test/; ls *sub" - $juser; return; }
   local job=${2:-test-vanilla.sub}
@@ -161,7 +161,7 @@ gve() {
   less /var/log/gwms-factory/server/entry_${1#entry_}/${1#entry_}.*.log
 }
 
-cd-with-memory() {
+cd_with_memory() {
   # use cd or pushd and record the directory in bash_aliases_aux BA_LASTDIR
   local cmd=cd
   if [[ "$1" = pushd ]]; then
@@ -187,13 +187,13 @@ cd-with-memory() {
   fi
 }
 
-get-glidein-dir-last() {
+get_glidein_dir_last() {
   # -u user -r root_dir (/tmp) -l
   local local OPTIND option user root_dir=/tmp
   local do_list=false
   while getopts u:r:lh option ; do
     case "${option}" in
-      h) echo "get-glidein-dir-last -l"; echo "get-glidein-dir-last [-u user][-r root_dir (default:/tmp)]"; return;;
+      h) echo "get_glidein_dir_last -l"; echo "get_glidein_dir_last [-u user][-r root_dir (default:/tmp)]"; return;;
       r) root_dir="${OPTARG}";;
       u) user="${OPTARG}";;
       l) do_list=true;;
@@ -212,7 +212,7 @@ get-glidein-dir-last() {
   fi
 }
 
-ssh-last() {
+ssh_last() {
   # return the full hostname of the last host of the requested type (or do partial name matches), optionally ssh to it
   # valid types: fact, factory, vofe, frontend, vofrontend, web, ce (fermicloud025), INT (fermicloudINT)
   # OpenStack presents all hosts of the project, "U_" prefix to search only user VMs
@@ -259,9 +259,9 @@ ssh-last() {
   fi
 }
 
-ssh-init-host() {
+ssh_init_host() {
   # init a fermicloud node
-  local hname=$(ssh-last $1)
+  local hname=$(ssh_last $1)
   local huser=${2:-root}
   echo "Initializing ${huser}@${hname}"
   #scp "$HOME"/prog/repos/git-gwms/gwms-tools/.bash_aliases ${huser}@${hname}: >/dev/null && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
@@ -289,7 +289,7 @@ fcldownload() {
   fi
 }
 
-fcl-fe-certs() {
+fcl_fe_certs() {
   # 1. pilot proxy path or file name (default: /etc/gwms-frontend/mm_proxy)
   # some checks to avoid running as regular user or on a host that is not the frontend
   command -v voms-proxy-init  >/dev/null || { echo "voms-proxy-init not found. aborting"; return 1; }
@@ -316,7 +316,7 @@ fcl-fe-certs() {
   fi
 }
 
-aliases-update() {
+aliases_update() {
   [ -e "$HOME/.bash_aliases" ] && command cp -f "$HOME"/.bash_aliases "$HOME"/.bash_aliases.bck
   if ! curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null; then
     echo "Download from github.com failed. Update failed."
