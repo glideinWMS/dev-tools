@@ -8,5 +8,5 @@ Comments and contributions are welcome.
 
 You can install the aliases and functions using `fclinit` from your laptop or desktop, or locally with:
 ```shell
-curl -L -o ~/.bash_aliases https://raw.githubusercontent.com/glideinWMS/dev-tools/master/.bash_aliases 2>/dev/null && . ~/.bash_aliases && aliases-update
+curl -L -o ~/.bash_aliases https://raw.githubusercontent.com/glideinWMS/dev-tools/master/.bash_aliases 2>/dev/null && . ~/.bash_aliases && aliases_update
 ```
