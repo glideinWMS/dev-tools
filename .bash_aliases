@@ -3,6 +3,7 @@
 # and use -t to force a terminal session (needed to insert interactive input like a password), -tt to force a tesminal also when ssh doesn't have it
 # e.g. alias fclremotesettoken="ssh -t -K openstackuigpvm01.fnal.gov  'bash -i -c fclsettoken' 2> /dev/null"
 # "$PWD" resolved at definition, '$PWD' resolved at use,  'part1 '"'"'quoted'"'"' part2' adds a single quoted part in a single quote string (string concatenation in shells) 
+# shellcheck shell=bash
 
 # Setup GWMS_DEV_USER in the environment as your desired fermicloud UI (openstackuigpvm01) user or substitute here (not needed if it is $USER)
 export GWMS_DEV_USER=${GWMS_DEV_USER:-$USER}
@@ -12,7 +13,7 @@ export GWMS_DEV_REPO_GIT="https://github.com/glideinWMS/dev-tools.git"
 # Setup (init and update) add ~/.bash_aliases ~/.bashcache/fclhosts and some files in ~/bin/
 
 #alias mvim="/Applications/MacVim.app/contents/MacOS/MacVim"
-alias mvim="open -a MacVim.app $@"
+alias mvim="open -a MacVim.app"
 #alias lt='ls --human-readable --size'
 alias lt='du -sh * | sort -h'
 alias cpv='rsync -ah --info=progress2'
@@ -21,6 +22,7 @@ alias va='source ./venv/bin/activate'
 alias dfh='df -h -T hfs,apfs,exfat,ntfs,noowners'
 # git
 alias gpo='git push origin'
+# shellcheck disable=SC2142  # the parameter is part of awk syntax
 alias gitmodified="git status | grep modified | awk '{print \$2}' | tr $'\n' ' '"
 alias gitgraph='git log --all --decorate --oneline --graph'
 alias cg='cd `git rev-parse --show-toplevel`'
@@ -96,29 +98,31 @@ alias ccrma='htc_foreach_schedd condor_rm -all -name'
 
 ## These are for root on fermicloud hosts
 # GWMS manage and troubleshoot
-alias festart='/bin/systemctl start gwms-frontend'
-alias festartall='for s in fetch-crl-cron httpd condor gwms-frontend fetch-crl-boot; do echo "Starting $s"; /bin/systemctl start $s; done'
-alias festop='/bin/systemctl stop gwms-frontend'
-alias fereconfig='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend reconfig; /bin/systemctl start gwms-frontend'
-alias feupgrade='/bin/systemctl stop gwms-frontend; /usr/sbin/gwms-frontend upgrade; /bin/systemctl start gwms-frontend'
+# /bin/systemctl is not working in the containers, use systemctl
+alias festart='systemctl start gwms-frontend'
+alias festartall1='for s in fetch-crl-cron httpd condor gwms-frontend fetch-crl-boot; do echo "Starting $s"; systemctl start $s; done'
+alias festop='systemctl stop gwms-frontend'
+alias fereconfig='systemctl stop gwms-frontend; /usr/sbin/gwms-frontend reconfig; systemctl start gwms-frontend'
+alias feupgrade='systemctl stop gwms-frontend; /usr/sbin/gwms-frontend upgrade; systemctl start gwms-frontend'
 alias fecredrenewal='fcl_fe_certs'  # alias to make it easy to find - renew proxy from certs/creds
-alias fetest='su -c "cd condor-test/; condor_submit test-vanilla.sub" -'
-alias feccq='CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_q -debug -global -allusers'
-alias fecca='CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_advertise -debug'
-alias fastart='/bin/systemctl start gwms-factory'
-alias fastartall='for s in fetch-crl-cron httpd condor gwms-factory fetch-crl-boot; do echo "Starting $s"; /bin/systemctl start $s; done'
-alias fastop='/bin/systemctl stop gwms-factory'
-alias faupgrade='/bin/systemctl stop gwms-factory; /usr/sbin/gwms-factory upgrade ; /bin/systemctl start gwms-factory'
-alias fareconfig='/bin/systemctl stop gwms-factory; /usr/sbin/gwms-factory reconfig; /bin/systemctl start gwms-factory'
+alias fetest='su -c "cd condor-test/; condor_submit test-vanilla.sub" -'  # the user to use for the test will be specified after the alias (fetest). condor-test/test-vanilla.sub is assumed
+# the followinf 2 commands myst run as the frontend user to have the correct token ownership and location
+alias feccq='su -c "CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_q -debug -global -allusers" -s /bin/bash - frontend'
+alias fecca='su -c "CONDOR_CONFIG=/var/lib/gwms-frontend/vofrontend/frontend.condor_config _CONDOR_TOOL_DEBUG=D_FULLDEBUG,D_SECURITY condor_advertise -debug" -s /bin/bash - frontend'
+alias fastart='systemctl start gwms-factory'
+alias fastartall='for s in fetch-crl-cron httpd condor gwms-factory fetch-crl-boot; do echo "Starting $s"; systemctl start $s; done'
+alias fastop='systemctl stop gwms-factory'
+alias faupgrade='systemctl stop gwms-factory; /usr/sbin/gwms-factory upgrade ; systemctl start gwms-factory'
+alias fareconfig='systemctl stop gwms-factory; /usr/sbin/gwms-factory reconfig; systemctl start gwms-factory'
 
 
 ## Functions
 dict() {
   # dict word [dictionary (as from dictlist)]   OR dict word:dictionary
   if [ -n "$2" ]; then
-    curl dict://dict.org/d:${1}:${2}
+    curl dict://dict.org/d:"${1}:${2}"
   else
-    curl dict://dict.org/d:${1}
+    curl dict://dict.org/d:"${1}"
   fi
 }
 
@@ -127,7 +131,7 @@ translate() {
   # using 3 letters languages as in FreeDict
   local lan_from=${3:-eng}
   local lan_to=${2:-ita}
-  dict $1:fd-${lan_from}-${lan_to}
+  dict "$1":fd-"${lan_from}"-"${lan_to}"
 }
 
 cl() {
@@ -148,8 +152,9 @@ gwms_test_job() {
   local juser=${1:-$GWMS_DEV_USER}
   [[ "$2" = "-l" ]] && { su -c "cd condor-test/; ls *sub" - $juser; return; }
   local job=${2:-test-vanilla.sub}
-  if [ $(id -u) -eq 0 ]; then
-    local juserdir=$(eval echo "~$juser")
+  if [ "$(id -u)" -eq 0 ]; then
+    local juserdir
+    juserdir=$(eval echo "~$juser")
     [[ -e "$job" || -e ${juserdir}/condor-test/$job ]] && su -c "cd ${juserdir}/condor-test/; condor_submit $job" - $juser || su -c "cd ${juserdir}/condor-test/; ls *${job}*" - $juser
   else
     [[ "$PWD" = */condor-test ]] || cd condor-test/
@@ -175,6 +180,7 @@ cd_with_memory() {
     command mv ~/.bash_aliases_aux.new ~/.bash_aliases_aux
     $cmd "$1"
   else
+    # cache script with wariables to load
     . ~/.bash_aliases_aux
     local lastdir=${BA_LASTDIR}
     if [ -n "$lastdir" ]; then
@@ -189,7 +195,7 @@ cd_with_memory() {
 
 get_glidein_dir_last() {
   # -u user -r root_dir (/tmp) -l
-  local local OPTIND option user root_dir=/tmp
+  local OPTIND option user root_dir=/tmp
   local do_list=false
   while getopts u:r:lh option ; do
     case "${option}" in
@@ -205,6 +211,7 @@ get_glidein_dir_last() {
     ls -ldt "$root_dir"/glide_*
     return
   fi
+  # echo added to compress spaces?
   if [[ -z "$user" ]]; then
     echo "$(ls -dt "$root_dir"/glide_* | head -n 1)"
   else
@@ -249,24 +256,28 @@ ssh_last() {
     myhost=$sel
   fi
   shift
-  echo $myhost
+  echo "$myhost"
   if $dossh; then
     if $asroot; then
-      ssh root@$myhost "$@"
+      # shellcheck disable=SC2029  # client expansion desired, these are ssh options
+      ssh root@"$myhost" "$@"
     else
-      ssh $myhost "$@"
+      # shellcheck disable=SC2029  # client expansion desired, these are ssh options
+      ssh "$myhost" "$@"
     fi
   fi
 }
 
 ssh_init_host() {
   # init a fermicloud node
-  local hname=$(ssh_last $1)
+  local hname
+  hname=$(ssh_last "$1")
   local huser=${2:-root}
   echo "Initializing ${huser}@${hname}"
   #scp "$HOME"/prog/repos/git-gwms/gwms-tools/.bash_aliases ${huser}@${hname}: >/dev/null && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
   #ssh ${huser}@${hname}  "curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null" && ssh ${huser}@${hname}  ". .bash_aliases && aliases-update"
-  ssh ${huser}@${hname}  "curl -L -o ~/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null && . ~/.bash_aliases && aliases-update"
+  # shellcheck disable=SC2029  # client expansion desired
+  ssh "${huser}@${hname}"  "curl -L -o ~/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null && . ~/.bash_aliases && aliases-update"
 }
 
 fcldownload() {
@@ -281,7 +292,7 @@ fcldownload() {
   if [ -n "$dfile" ]; then
     curl -L -o "$dfile" "$GWMS_DEV_REPO/$(basename "$dfile")"
     if head -n 1  "$dfile" | grep -q "404: Not Found" ; then
-      echo "URL not found ($GWMS_DEV_REPO/$(basename "$dfile")). Removing file ("$dfile")."
+      echo "URL not found ($GWMS_DEV_REPO/$(basename "$dfile")). Removing file ($dfile)."
       rm "$dfile"
     else
       $make_exe && chmod +x "$dfile"
@@ -297,9 +308,9 @@ fcl_fe_certs() {
   local pilot_proxy=$1
   [[ -n "$pilot_proxy" ]] && pilot_proxy=/etc/gwms-frontend/mm_proxy
   [[ "$pilot_proxy" = /* ]] || pilot_proxy=/etc/gwms-frontend/"$pilot_proxy"
-  pushd /etc/grid-security/
+  pushd /etc/grid-security/ || return 1
   grid-proxy-init -cert hostcert.pem -key hostkey.pem -valid 999:0 -out /etc/gwms-frontend/fe_proxy
-  popd
+  popd || return 1
   /bin/cp /etc/gwms-frontend/fe_proxy /etc/gwms-frontend/vo_proxy
   kx509
   voms-proxy-init -rfc -dont-verify-ac -noregen -voms fermilab -valid 500:0
@@ -318,12 +329,12 @@ fcl_fe_certs() {
 
 aliases_update() {
   [ -e "$HOME/.bash_aliases" ] && command cp -f "$HOME"/.bash_aliases "$HOME"/.bash_aliases.bck
-  if ! curl -L -o $HOME/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null; then
+  if ! curl -L -o "$HOME"/.bash_aliases $GWMS_DEV_REPO/.bash_aliases 2>/dev/null; then
     echo "Download from github.com failed. Update failed."
     return 1
   fi
-  if ! grep "# Added by alias-update" $HOME/.bashrc >/dev/null; then
-    cat >> $HOME/.bashrc << EOF
+  if ! grep "# Added by alias-update" "$HOME"/.bashrc >/dev/null; then
+    cat >> "$HOME"/.bashrc << EOF
 # Added by alias-update
 export PATH="\$PATH:\$HOME/bin"
 if [ -e \$HOME/.bash_aliases ]; then
@@ -336,7 +347,7 @@ EOF
   mkdir -p "$HOME"/.fclcache
   mkdir -p "$HOME"/bin
   for i in gwms-clean-logs.sh gwms-setup-script.py gwms-what.sh gwms-check-auth.sh gwms-check-proxies.sh myhosts.sh 99_debug.config; do
-    curl -L -o $HOME/bin/$i $GWMS_DEV_REPO/$i 2>/dev/null && chmod +x $HOME/bin/$i
+    curl -L -o "$HOME/bin/$i" "$GWMS_DEV_REPO/$i" 2>/dev/null && chmod +x "$HOME/bin/$i"
     [[ $? -ne 0 ]] && echo "Error downloading $i. Continuing."
   done
   # If root, update some system files. This only for fermicloud hosts
@@ -407,13 +418,14 @@ htc_foreach_schedd() {
     filter=htc_filter1
     shift
   fi
-  local sc_list="$(condor_status -schedd -af Name)"
+  local sc_list
+  sc_list="$(condor_status -schedd -af Name)"
   for i in $sc_list; do
     $verbose && echo "# $i"
     if [[ -z "$filter" ]]; then
-      "$@" $i
+      "$@" "$i"
     else
-      "$@" $i | $filter
+      "$@" "$i" | $filter
     fi
   done
 }

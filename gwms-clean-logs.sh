@@ -2,27 +2,27 @@
 BASEDIR=/opt/oldlog
 SOURCEDIR=$HOME/bin
 
-mydate="`date +"%Y%m%d-%H%M%S-%s"`"
+mydate="$(date +"%Y%m%d-%H%M%S-%s")"
 function clean_condor {
   condor_dir="$BASEDIR/condor-$mydate"
   mkdir "$condor_dir"
-  pushd /var/log/condor > /dev/null
-  mv *Log* KernelTuning.log "$condor_dir"/
+  pushd /var/log/condor > /dev/null || return 1
+  mv ./*Log* KernelTuning.log "$condor_dir"/
   echo "Logs moved to $condor_dir"
-  popd > /dev/null
+  popd > /dev/null || return 1
 }
 
 function clean_gwms_fe {
   gwms_dir="$BASEDIR/gwms-$mydate"
   mkdir "$gwms_dir"
-  pushd /var/log/gwms-frontend > /dev/null
+  pushd /var/log/gwms-frontend > /dev/null || return 1
   mv frontend/frontend*.log* "$gwms_dir/"
   mv frontend/startup.log "$gwms_dir/"
   for i in group_*; do 
       mv "$i/${i:6}"*.log* "$gwms_dir/"
   done
   echo "Logs moved to $gwms_dir"
-  popd > /dev/null
+  popd > /dev/null || return 1
 }
 
 function clean_gwms_fa {
@@ -30,30 +30,30 @@ function clean_gwms_fa {
   # client logs not moved: job stdout/err and condor logs
   gwms_dir="$BASEDIR/gwms-$mydate"
   mkdir "$gwms_dir"
-  pushd /var/log/gwms-factory > /dev/null
+  pushd /var/log/gwms-factory > /dev/null || return 1
   mv server/factory/factory*.log* "$gwms_dir/"
   mv server/factory/group*.log* "$gwms_dir/"
   for i in server/entry_*; do 
-      j="`basename $i`"
+      j="$(basename $i)"
       mv "$i/${j:6}"*.log* "$gwms_dir/"
   done
   echo "Logs moved to $gwms_dir"
   if [ -n MV_CLIENT ]; then
     for i in client/*; do
-      pushd "$i"
+      pushd "$i" || return 1
       for j in *; do 
-	pushd "$j"
-	for k in entry_*; do
-	  mkdir "$gwms_dir/client_$i_$j_$k"
-	  mv "$k"/* "$gwms_dir/client_$i_$j_$k/"
-	done
-	popd > /dev/null
+        pushd "$j" || return 1
+        for k in entry_*; do
+          mkdir "$gwms_dir/client_${i}_${j}_${k}"
+          mv "$k"/* "$gwms_dir/client_${i}_${j}_${k}/"
+        done
+        popd > /dev/null || return 1
       done
-      popd > /dev/null
+      popd > /dev/null || return 1
     done
     echo "Client logs moved to $gwms_dir"
   fi
-  popd > /dev/null
+  popd > /dev/null || return 1
 }
 
 function print_help {
@@ -119,7 +119,9 @@ ALL_DEBUG = D_FULLDEBUG D_SECURITY
 EOF
   fi
 fi
-clean_condor
+if ! clean_condor; then
+  echo "FAILED to clean HTCondor"
+fi
 systemctl start condor
 
 # To le condor restart and avoid errors
@@ -129,14 +131,18 @@ condor_status -any
 
 # GWMS
 if [ -e /etc/gwms-frontend/frontend.xml ]; then
-  echo "Cleaning frontend"
-  clean_gwms_fe
+  echo "Cleaning Frontend"
+  if ! clean_gwms_fe; then
+    echo "FAILED to clean Frontend"
+  fi
   systemctl start gwms-frontend
 fi
 
 if [ -e /etc/gwms-factory/glideinWMS.xml ]; then
-  echo "Cleaning factory"
-  clean_gwms_fa
+  echo "Cleaning Factory"
+  if ! clean_gwms_fa; then
+    echo "FAILED to clean Factory"
+  fi
   systemctl start gwms-factory
 fi
 

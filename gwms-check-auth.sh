@@ -47,7 +47,7 @@ date2ts() {
 ts2date() {
   # Using function so it can be both on the line or piped
   # Unix timestamp to date conversion. Requires jq
-  [[ -n "$1" ]] && { jq 'todate' <<< $1 ; true;} || jq 'todate'
+  [[ -n "$1" ]] && { jq 'todate' <<< "$1" ; true;} || jq 'todate'
 }
 
 # Check that x509 CA certificates exist and set the env variable X509_CERT_DIR
@@ -85,7 +85,7 @@ get_ca_certs_dir() {
 # Return 1 and error string if failing
 #        0 and certs dir path if succeeding
 check_auth_tools() {
-    local cmd commands_found commands_missing commands_tmp missing_commands=0
+    local cmd commands_found commands_missing commands_tmp
     # verify x509 commands, at least one needed
     for cmd in grid-proxy-info voms-proxy-info openssl ; do
         if ! command -v $cmd >& /dev/null; then
@@ -102,6 +102,7 @@ check_auth_tools() {
     commands_found="$commands_tmp"
     commands_tmp=
     # verify tokens commands, all needed
+    # shellcheck disable=SC2043  # at the moment a single command, OK
     for cmd in jq ; do
         if ! command -v $cmd >& /dev/null; then
             log_debug "$cmd command not found in path!"
@@ -166,7 +167,7 @@ get_subject_x509_openssl() {
     output=$(openssl x509 -noout -subject -in "$cert_pathname" 2>/dev/null) || { log_debug "openssl command failed"; return 1; }
     # should remove the proxy parts from the subject? Needed if adding the subject in gridmap files
     # output=${output%%/CN=proxy*}
-    echo ${output#subject= }
+    echo "${output#subject= }"
 }
 get_subject_x509() {
     # -subject, -issuer, or -identity?
@@ -289,7 +290,7 @@ get_proxy_fname() {
         fi
     fi
     # should it control if the file exists?
-    log_debug "Using proxy file $cert_fname (`[ -e "$cert_fname" ] && echo "OK" || echo "No file"`)"
+    log_debug "Using proxy file $cert_fname ($([ -e "$cert_fname" ] && echo "OK" || echo "No file"))"
     echo "$cert_fname"
 }
 
@@ -311,6 +312,11 @@ get_status() {
 #      2 wrong ownership
 #      3 stat command failed
 check_file_stats() {
+    if ! "$CHECK_STATS"; then
+        # skipping permissions check
+        true
+        return
+    fi
     local out perm
     perm="600"
     [[ -n "$3" ]] && perm="$3" || true

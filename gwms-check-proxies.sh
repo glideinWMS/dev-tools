@@ -7,8 +7,7 @@ FACTORY_USER=factory
 
 VERBOSE=yes
 
-which voms-proxy-info > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+if ! which voms-proxy-info > /dev/null 2>&1 ; then
   echo "Missing voms-proxy-info. Please install it to continue."
   exit 1
 fi
@@ -56,7 +55,7 @@ if [ "$start_epoch" -gt "$epoch_now" ]; then
   echo "Host certificate is not yet valid"
   seconds_to_expire=0
 else
-  seconds_to_expire=$(($end_epoch - $epoch_now))
+  seconds_to_expire=$((end_epoch - epoch_now))
 fi
 
 echo "/etc/grid-security/hostcert.pem valid for sec: $seconds_to_expire"

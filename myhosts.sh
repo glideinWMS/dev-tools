@@ -27,7 +27,7 @@ get_token() {
   # Env: HOME USER
   # The following command will ask for the service password
   $VERBOSE && echo "No OS token. Requesting it ($USER, $OST_PROJECT). You vill be asked for the service passord."
-  OS_TOKEN=$(openstack --os-username=$USER  --os-user-domain-name=services --os-project-domain-name=services --os-project-name $OST_PROJECT  --os-auth-url http://131.225.153.227:5000/v3  --os-system-scope all token issue --format json | jq -r '.id')
+  OS_TOKEN=$(openstack --os-username="$USER"  --os-user-domain-name=services --os-project-domain-name=services --os-project-name "$OST_PROJECT"  --os-auth-url http://131.225.153.227:5000/v3  --os-system-scope all token issue --format json | jq -r '.id')
   [ -z "$OS_TOKEN" ] && { echo "Unable to obtain OS token. Aborting." >&2; exit 2; }
   rm -f "$HOME"/.fclcache/token
   echo "OST_PROJECT=$OST_PROJECT" > "$HOME"/.fclcache/token
@@ -60,6 +60,7 @@ if $REFRESH; then
 else
   if [ -z "$OS_TOKEN" ]; then
     if [ -r "$HOME"/.fclcache/token ] && grep "OST_PROJECT=$OST_PROJECT"  "$HOME"/.fclcache/token > /dev/null; then
+      # Source variable defining the OS_TOKEN
       .  "$HOME"/.fclcache/token
     elif $GET_TOKEN; then
       get_token
